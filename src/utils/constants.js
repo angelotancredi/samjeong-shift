@@ -28,9 +28,15 @@ export const DUTY_ROLES = [
  * cycleBase: { baseDate: "YYYY-MM-DD", baseTeam: 1|2|3 }
  */
 function parseDate(d) {
-  if (typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
-    const [y, m, day] = d.split("-").map(Number);
-    return new Date(y, m - 1, day);
+  if (!d) return new Date();
+  if (d instanceof Date) return d;
+  
+  if (typeof d === "string") {
+    const datePart = d.split("T")[0];
+    if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+      const [y, m, day] = datePart.split("-").map(Number);
+      return new Date(y, m - 1, day);
+    }
   }
   return new Date(d);
 }
