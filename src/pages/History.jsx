@@ -123,11 +123,11 @@ export default function History() {
       {/* 요약 */}
       <div className="flex gap-3 px-4 py-3">
         {[
-          { label:"전체", value: incidents.length, color:"text-black" },
-          { label:"대체완료", value: incidents.filter((i) => !isPartialOrMissing(i)).length, color:"text-blue-600" },
-          { label:"대체자 미정", value: incidents.filter((i) => isPartialOrMissing(i)).length, color:"text-orange-400" },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="flex-1 bg-white rounded-xl px-4 py-3 shadow-sm text-center">
+          { label:"전체", value: incidents.length, color:"text-slate-500", bg:"bg-slate-100" },
+          { label:"대체완료", value: incidents.filter((i) => !isPartialOrMissing(i)).length, color:"text-sky-500", bg:"bg-sky-100" },
+          { label:"대체자 미정", value: incidents.filter((i) => isPartialOrMissing(i)).length, color:"text-rose-400", bg:"bg-rose-100" },
+        ].map(({ label, value, color, bg }) => (
+          <div key={label} className={`flex-1 ${bg} rounded-xl px-4 py-3 shadow-sm text-center`}>
             <p className={`text-2xl font-bold ${color}`}>{value}</p>
             <p className="text-xs text-gray-600">{label}</p>
           </div>
@@ -185,6 +185,7 @@ export default function History() {
 }
 
 function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) {
+  const [deleteSubInfo, setDeleteSubInfo] = useState(null);
   const isDuty = inc.shift === "당번";
   const daySub = inc.substitutes?.find((s) => s.subShift === "주간");
   const nightSub = inc.substitutes?.find((s) => s.subShift === "야간");
@@ -196,7 +197,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
       <div className="flex items-start gap-3">
         <RankBadge rank={inc.user?.rank} size="md" />
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 flex-wrap">
             <span className="font-bold text-black">{inc.user?.name}</span>
             <span className="text-xs text-gray-600">{inc.user?.team}팀</span>
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${REASON_COLORS[inc.reason] || "bg-gray-100 text-gray-800"}`}>{inc.reason}</span>
@@ -220,9 +221,9 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col gap-1.5 flex-1">
               <SubRow label="주간" sub={daySub} missing={!daySub}
-                onRemove={daySub ? () => removeSubstitute({ incidentId: inc._id, subShift: "주간" }) : undefined} />
+                onRemove={daySub ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "주간" }) : undefined} />
               <SubRow label="야간" sub={nightSub} missing={!nightSub}
-                onRemove={nightSub ? () => removeSubstitute({ incidentId: inc._id, subShift: "야간" }) : undefined} />
+                onRemove={nightSub ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "야간" }) : undefined} />
             </div>
             {isPartialOrMissing && (
               <button onClick={onAddSub}
@@ -235,14 +236,16 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
         ) : singleSub ? (
           // 주간/야간: 단일 대체자
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-600 font-medium">대체</span>
-            <RankBadge rank={singleSub.user?.rank} size="sm" />
-            <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
-            <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
-            <button onClick={() => removeSubstitute({ incidentId: inc._id })}
-              className="ml-auto text-gray-300 hover:text-red-400 transition-colors p-0.5">
-              <Trash2 size={13} />
-            </button>
+            <span className="text-xs text-gray-600 font-medium w-14">대체</span>
+            <div className="flex items-center gap-1.5 flex-1">
+              <RankBadge rank={singleSub.user?.rank} size="sm" />
+              <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
+              <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
+              <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
+                className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
+                <Trash2 size={13} />
+              </button>
+            </div>
           </div>
         ) : (
           // 미정
@@ -256,6 +259,22 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
           </div>
         )}
       </div>
+
+      {/* 대체자 삭제 확인 모달 */}
+      {deleteSubInfo && (
+        <div className="fixed inset-0 z-50 flex items-end">
+          <div className="absolute inset-0 bg-black/30" onClick={() => setDeleteSubInfo(null)} />
+          <div className="relative w-full bg-white rounded-t-3xl p-6">
+            <h3 className="font-bold text-lg text-black mb-2">대체자를 삭제하시겠습니까?</h3>
+            <p className="text-gray-700 text-sm mb-5">이 대체자 정보를 삭제하면 복구할 수 없습니다.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteSubInfo(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
+              <button onClick={async () => { await removeSubstitute(deleteSubInfo); setDeleteSubInfo(null); }}
+                className="flex-1 py-3.5 bg-red-500 rounded-xl font-semibold text-white">삭제</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -271,7 +290,7 @@ function SubRow({ label, sub, missing, onRemove }) {
           <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
           {onRemove && (
             <button onClick={onRemove}
-              className="ml-auto text-gray-300 hover:text-red-400 transition-colors p-0.5">
+              className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
               <Trash2 size={13} />
             </button>
           )}
