@@ -71,12 +71,12 @@ export default function Home() {
               <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
               <p className="text-sm text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
             </div>
-            {profile && (
-              <div className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
-                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
-              </div>
-            )}
+             {profile && (
+               <div className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                 <span className="text-[12px] text-blue-600 font-bold">{profile.rank}</span>
+                 <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+               </div>
+             )}
           </div>
           <div className="flex items-center gap-1">
             <button onClick={() => window.location.reload()} className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
@@ -187,11 +187,11 @@ export default function Home() {
         </div>
       </div>
 
-      {/* FAB */}
-      <button onClick={() => navigate("/incident-register")}
-        className="fixed right-5 bottom-[84px] w-14 h-14 bg-blue-600 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-30">
-        <Plus size={26} className="text-white" strokeWidth={2.5} />
-      </button>
+       {/* FAB */}
+       <button onClick={() => navigate("/incident-register")}
+         className="fixed right-5 bottom-[94px] w-14 h-14 bg-blue-600 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-30">
+         <Plus size={26} className="text-white" strokeWidth={2.5} />
+       </button>
 
       {/* Day modal */}
       {showModal && selectedDate && (
