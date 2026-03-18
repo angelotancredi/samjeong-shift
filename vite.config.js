@@ -13,7 +13,7 @@ export default defineConfig({
         short_name: '삼정근무표',
         description: '삼정119안전센터 대체근무 관리 시스템',
         theme_color: '#2563eb',
-        background_color: '#ffffff',
+        background_color: '#2563eb',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',

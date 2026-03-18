@@ -13,8 +13,9 @@ import Admin from "./pages/Admin";
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-screen bg-blue-600 flex flex-col items-center justify-center">
+      <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4" />
+      <p className="text-white font-medium animate-pulse">데이터를 불러오는 중...</p>
     </div>
   );
   if (!user) return <Navigate to="/login" replace />;

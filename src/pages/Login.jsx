@@ -92,7 +92,7 @@ export default function Login() {
           </button>
         </form>
 
-        <button onClick={() => navigate("/register")} className="w-full text-center text-sm text-gray-700 mt-4 py-2">
+        <button onClick={() => navigate("/register")} className="w-full text-center text-sm text-gray-700 mt-1 py-1">
           계정이 없으신가요?{" "}
           <span className="text-blue-600 font-semibold">회원가입</span>
         </button>
