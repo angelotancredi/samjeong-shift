@@ -175,7 +175,15 @@ export default function Home() {
                           <span className="text-sm font-medium text-black">{inc.user?.name}</span>
                           <span className="text-xs text-gray-500">
                             ({inc.reason}
-                            {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && ` ${inc.startTime}~${inc.endTime}`}
+                            {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && (() => {
+                              const [startH, startM] = inc.startTime.split(':').map(Number);
+                              const [endH, endM] = inc.endTime.split(':').map(Number);
+                              const totalStart = startH * 60 + startM;
+                              const totalEnd = endH * 60 + endM;
+                              const diffMin = totalEnd - totalStart;
+                              const diffHours = Math.round(diffMin / 60 * 10) / 10;
+                              return ` ${diffHours}h / ${startH}~${endH}`;
+                            })()}
                             {inc.shift && ` · ${inc.shift}`})
                           </span>
                           {inc.duty && <span className="text-xs bg-indigo-50 text-indigo-600 font-medium px-2 py-0.5 rounded-full">{inc.duty}</span>}
@@ -260,7 +268,15 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
                         <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-1 rounded-full">
                           {inc.reason}
                           {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && (
-                            <span className="ml-1">{inc.startTime}~{inc.endTime}</span>
+                            <span className="ml-1">{(() => {
+                              const [startH, startM] = inc.startTime.split(':').map(Number);
+                              const [endH, endM] = inc.endTime.split(':').map(Number);
+                              const totalStart = startH * 60 + startM;
+                              const totalEnd = endH * 60 + endM;
+                              const diffMin = totalEnd - totalStart;
+                              const diffHours = Math.round(diffMin / 60 * 10) / 10;
+                              return `${diffHours}h / ${startH}~${endH}`;
+                            })()}</span>
                           )}
                         </span>
                         {inc.shift && <span className="text-xs bg-gray-200 text-gray-600 font-medium px-2 py-1 rounded-full">{inc.shift}</span>}
@@ -317,10 +333,11 @@ function SubstituteDisplay({ inc, onAddSub }) {
           {[{ label:"🌞 주간", sub: daySub }, { label:"🌙 야간", sub: nightSub }].map(({ label, sub }) => (
             <div key={label} className="flex items-center gap-2">
               <span className="text-xs text-gray-500 w-14">{label}</span>
-              {sub ? (
+               {sub ? (
                 <div className="flex items-center gap-1.5">
                   <RankBadge rank={sub.user?.rank} size="sm" />
                   <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
+                  <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
                 </div>
               ) : (
                 <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
@@ -346,6 +363,36 @@ function SubstituteDisplay({ inc, onAddSub }) {
         <RankBadge rank={singleSub.user?.rank} size="sm" />
         <span className="text-sm font-medium text-gray-900">{singleSub.user?.name}</span>
         <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
+      </div>
+    );
+  }
+
+  if (isDuty) {
+    return (
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1 flex-1">
+          {[{ label:"🌞 주간", sub: daySub }, { label:"🌙 야간", sub: nightSub }].map(({ label, sub }) => (
+            <div key={label} className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 w-14">{label}</span>
+              {sub ? (
+                <div className="flex items-center gap-1.5">
+                  <RankBadge rank={sub.user?.rank} size="sm" />
+                  <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
+                  <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
+                </div>
+              ) : (
+                <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
+              )}
+            </div>
+          ))}
+        </div>
+        {!hasAll && (
+          <button onClick={onAddSub}
+            className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
+            <UserPlus size={12} />
+            대체자 등록
+          </button>
+        )}
       </div>
     );
   }

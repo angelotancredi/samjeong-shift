@@ -204,7 +204,15 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${REASON_COLORS[inc.reason] || "bg-gray-100 text-gray-800"}`}>
               {inc.reason}
               {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && (
-                <span className="ml-1 text-orange-600">{inc.startTime}~{inc.endTime}</span>
+                <span className="ml-1 text-orange-600">{(() => {
+                  const [startH, startM] = inc.startTime.split(':').map(Number);
+                  const [endH, endM] = inc.endTime.split(':').map(Number);
+                  const totalStart = startH * 60 + startM;
+                  const totalEnd = endH * 60 + endM;
+                  const diffMin = totalEnd - totalStart;
+                  const diffHours = Math.round(diffMin / 60 * 10) / 10;
+                  return `${diffHours}h / ${startH}~${endH}`;
+                })()}</span>
               )}
             </span>
             {inc.shift && <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{inc.shift}</span>}
