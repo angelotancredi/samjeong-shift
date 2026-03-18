@@ -48,11 +48,14 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        // Convex API는 절대 캐시하지 않음 — 항상 네트워크 직접 요청
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: [
           {
+            // Convex 실시간 연결은 캐시 제외
             urlPattern: /^https:\/\/.*\.convex\.cloud\/.*/i,
-            handler: 'NetworkFirst',
-            options: { cacheName: 'convex-cache' },
+            handler: 'NetworkOnly',
           },
         ],
       },
