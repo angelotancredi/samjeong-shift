@@ -103,7 +103,7 @@ export default function History() {
         {[
           { label:"전체", value: incidents.length, color:"text-black" },
           { label:"대체완료", value: incidents.filter((i) => !isPartialOrMissing(i)).length, color:"text-blue-600" },
-          { label:"미정", value: incidents.filter((i) => isPartialOrMissing(i)).length, color:"text-orange-400" },
+          { label:"대체자 미정", value: incidents.filter((i) => isPartialOrMissing(i)).length, color:"text-orange-400" },
         ].map(({ label, value, color }) => (
           <div key={label} className="flex-1 bg-white rounded-xl px-4 py-3 shadow-sm text-center">
             <p className={`text-2xl font-bold ${color}`}>{value}</p>
@@ -216,7 +216,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
         ) : (
           // 미정
           <div className="flex items-center justify-between">
-            <span className="text-xs bg-orange-50 text-orange-500 font-medium px-2 py-1 rounded-full">대체자 미정</span>
+            <span className="text-xs text-orange-400 bg-orange-50 font-bold px-3 py-1 rounded-full">대체자 미정</span>
             <button onClick={onAddSub}
               className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full">
               <UserPlus size={12} />

@@ -320,7 +320,7 @@ function SubstituteDisplay({ inc, onAddSub }) {
 
   return (
     <div className="flex items-center justify-between">
-      <span className="text-xs bg-orange-50 text-orange-500 font-medium px-2 py-1 rounded-full">대체자 미정</span>
+      <span className="text-xs text-orange-400 bg-orange-50 font-bold px-3 py-1 rounded-full">대체자 미정</span>
       <button onClick={onAddSub}
         className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full">
         <UserPlus size={12} />
