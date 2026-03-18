@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Info, Calendar as CalendarIcon, Clock, AlertCircle, Check, MapPin, RefreshCw } from "lucide-react";
+import { ChevronLeft, Info, Calendar as CalendarIcon, Clock, AlertCircle, Check, MapPin, RefreshCw, Search } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../context/AuthContext";
@@ -25,6 +25,8 @@ export default function IncidentRegister() {
     reason: "",
     duty: "",
     note: "",
+    startTime: "",
+    endTime: "",
     // 주간/야간 단일
     substitute_user_id: null,
     substitute_user: null,
@@ -57,7 +59,14 @@ export default function IncidentRegister() {
     </div>
   );
 
-  const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const update = (k, v) => {
+    const newForm = { ...form, [k]: v };
+    // reason이 "지각" 또는 "조퇴"이면 shift 초기화
+    if (k === "reason" && (v === "지각" || v === "조퇴")) {
+      newForm.shift = "";
+    }
+    setForm(newForm);
+  };
 
   const isDuty = form.shift === "당번";
 
@@ -69,9 +78,25 @@ export default function IncidentRegister() {
     .sort((a, b) => a.team - b.team || (a.name || "").localeCompare(b.name || ""));
 
   const handleSubmit = async () => {
-    if (!form.date || !form.shift || !form.reason) {
-      alert("날짜, 근무 구분, 사유를 모두 입력해주세요.");
+    const isLateLateLeave = form.reason === "지각" || form.reason === "조퇴";
+    if (!form.date || !form.reason) {
+      alert("날짜와 사유를 모두 입력해주세요.");
       return;
+    }
+    if (!isLateLateLeave && !form.shift) {
+      alert("근무 구분을 선택해주세요.");
+      return;
+    }
+    // 지각/조퇴 시 시간 입력 필수 및 검증
+    if (isLateLateLeave) {
+      if (!form.startTime || !form.endTime) {
+        alert("지각/조퇴는 시간 범위를 입력해주세요.");
+        return;
+      }
+      if (form.startTime >= form.endTime) {
+        alert("시작 시간은 종료 시간보다 빨라야 합니다.");
+        return;
+      }
     }
     setLoading(true);
     try {
@@ -82,6 +107,8 @@ export default function IncidentRegister() {
         reason: form.reason,
         duty: form.duty || undefined,
         note: form.note || undefined,
+        startTime: form.startTime || undefined,
+        endTime: form.endTime || undefined,
         registeredBy: profile?._id,
         // 당번이면 주간/야간 각각, 아니면 단일
         substituteUserId: isDuty
@@ -106,7 +133,7 @@ export default function IncidentRegister() {
       incident_user_id: profile?._id,
       incident_user: profile,
       date: initialDate,
-      shift: "", reason: "", duty: "", note: "",
+      shift: "", reason: "", duty: "", note: "", startTime: "", endTime: "",
       substitute_user_id: null, substitute_user: null,
       sub_day_id: null, sub_day: null,
       sub_night_id: null, sub_night: null,
@@ -137,6 +164,12 @@ export default function IncidentRegister() {
             <span className="text-xs font-medium text-gray-500">사유</span>
             <span className="text-sm font-bold text-red-500">{form.reason}</span>
           </div>
+          {(form.startTime || form.endTime) && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-gray-500">시간</span>
+              <span className="text-sm font-semibold text-gray-900">{form.startTime}~{form.endTime}</span>
+            </div>
+          )}
           <div className="h-px bg-gray-200" />
           <div className="flex items-center gap-2">
             <span className="text-xs font-medium text-gray-500">사고자</span>
@@ -199,7 +232,7 @@ export default function IncidentRegister() {
             )}
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={() => window.location.reload()} className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+            <button onClick={() => window.location.reload()} className="p-2 text-blue-600 hover:text-blue-700 transition-colors">
               <RefreshCw size={18} />
             </button>
             <NotificationBell size={18} />
@@ -247,21 +280,27 @@ export default function IncidentRegister() {
 
       {/* 하단 버튼 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 pt-4 pb-10 safe-bottom">
-        {step === 1 ? (
-          <button
-            onClick={() => {
-              if (!form.date || !form.shift || !form.reason) {
-                alert("날짜, 근무 구분, 사유를 모두 입력해주세요.");
-                return;
-              }
-              setSearchQuery("");
-              setStep(2);
-            }}
-            className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-base"
-          >
-            다음 → 대체근무자 지정
-          </button>
-        ) : (
+         {step === 1 ? (
+           <button
+             onClick={() => {
+               const isLateLateLeave = form.reason === "지각" || form.reason === "조퇴";
+               if (!form.date || !form.reason) {
+                 alert("날짜와 사유를 모두 입력해주세요.");
+                 return;
+               }
+               if (!isLateLateLeave && !form.shift) {
+                 alert("근무 구분을 선택해주세요.");
+                 return;
+               }
+               // 지각/조퇴도 항상 대체근무자 지정 단계로 이동
+               setSearchQuery("");
+               setStep(2);
+             }}
+             className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-base"
+           >
+             다음 → 대체근무자 지정
+           </button>
+         ) : (
           <div className="flex gap-3">
             {/* 대체자 없이 등록 — 항상 한 번 클릭으로 등록 */}
             <button
@@ -329,14 +368,25 @@ function Step1({ form, update, profile }) {
       <div className="bg-white rounded-2xl p-4 shadow-sm">
         <h3 className="font-bold text-black mb-3">근무 구분</h3>
         <div className="grid grid-cols-3 gap-2">
-          {SHIFT_TYPES.map((s) => (
-            <button key={s} onClick={() => update("shift", s)}
-              className={`py-3 rounded-xl text-sm font-semibold transition-all ${form.shift === s ? "bg-blue-600 text-white" : "bg-gray-50 text-gray-800 border border-gray-100"}`}>
-              {s}
-            </button>
-          ))}
+          {SHIFT_TYPES.map((s) => {
+            const isDisabled = form.reason === "지각" || form.reason === "조퇴";
+            return (
+              <button key={s} 
+                onClick={() => !isDisabled && update("shift", s)}
+                disabled={isDisabled}
+                className={`py-3 rounded-xl text-sm font-semibold transition-all ${
+                  isDisabled
+                    ? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed opacity-60"
+                    : form.shift === s 
+                      ? "bg-blue-600 text-white" 
+                      : "bg-gray-50 text-gray-800 border border-gray-100"
+                }`}>
+                {s}
+              </button>
+            );
+          })}
         </div>
-        {form.shift === "당번" && (
+        {!(form.reason === "지각" || form.reason === "조퇴") && form.shift === "당번" && (
           <p className="text-xs text-blue-500 mt-2 font-medium">
             ℹ️ 당번은 주간·야간 대체근무자를 각각 지정할 수 있어요
           </p>
@@ -354,6 +404,86 @@ function Step1({ form, update, profile }) {
           ))}
         </div>
       </div>
+
+      {/* 지각/조퇴시 시간 입력 */}
+      {(form.reason === "지각" || form.reason === "조퇴") && (
+        <div className="bg-white rounded-2xl p-4 shadow-sm">
+          <h3 className="font-bold text-black mb-3">시간 범위</h3>
+          <div className="flex items-center gap-3">
+            {/* 시작 시간 */}
+            <div className="flex items-center gap-2 flex-1">
+              <select
+                value={form.startTime.split(':')[0] || ""}
+                onChange={(e) => {
+                  const mins = form.startTime.split(':')[1] || "00";
+                  update("startTime", `${e.target.value}:${mins}`);
+                }}
+                className="flex-1 px-3 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">시 선택</option>
+                {Array.from({ length: 24 }, (_, i) => (
+                  <option key={i} value={String(i).padStart(2, "0")}>
+                    {String(i).padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <span className="text-gray-400 font-semibold">:</span>
+              <select
+                value={form.startTime.split(':')[1] || ""}
+                onChange={(e) => {
+                  const hours = form.startTime.split(':')[0] || "00";
+                  update("startTime", `${hours}:${e.target.value}`);
+                }}
+                className="flex-1 px-3 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">분 선택</option>
+                <option value="00">00</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+            <span className="text-gray-400 font-semibold">~</span>
+            {/* 종료 시간 */}
+            <div className="flex items-center gap-2 flex-1">
+              <select
+                value={form.endTime.split(':')[0] || ""}
+                onChange={(e) => {
+                  const mins = form.endTime.split(':')[1] || "00";
+                  update("endTime", `${e.target.value}:${mins}`);
+                }}
+                className="flex-1 px-3 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">시 선택</option>
+                {Array.from({ length: 24 }, (_, i) => (
+                  <option key={i} value={String(i).padStart(2, "0")}>
+                    {String(i).padStart(2, "0")}
+                  </option>
+                ))}
+              </select>
+              <span className="text-gray-400 font-semibold">:</span>
+              <select
+                value={form.endTime.split(':')[1] || ""}
+                onChange={(e) => {
+                  const hours = form.endTime.split(':')[0] || "00";
+                  update("endTime", `${hours}:${e.target.value}`);
+                }}
+                className="flex-1 px-3 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">분 선택</option>
+                <option value="00">00</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 담당 업무 */}
       <DutySelector value={form.duty} onChange={(v) => update("duty", v)} />
@@ -655,3 +785,5 @@ function DutySelector({ value, onChange }) {
     </>
   );
 }
+
+

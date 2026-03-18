@@ -52,7 +52,7 @@ export default function MyPage() {
             )}
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={() => window.location.reload()} className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+            <button onClick={() => window.location.reload()} className="p-2 text-blue-600 hover:text-blue-700 transition-colors">
               <RefreshCw size={18} />
             </button>
             <NotificationBell />

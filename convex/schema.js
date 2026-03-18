@@ -23,6 +23,8 @@ export default defineSchema({
     duty: v.optional(v.string()),  // 담당 업무
     note: v.optional(v.string()),
     registeredBy: v.optional(v.id("users")),
+    startTime: v.optional(v.string()),  // 시작 시간 "HH:MM" 형식 (지각/조퇴용)
+    endTime: v.optional(v.string()),    // 종료 시간 "HH:MM" 형식 (지각/조퇴용)
   })
     .index("by_date", ["date"])
     .index("by_userId", ["userId"]),

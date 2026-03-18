@@ -66,7 +66,7 @@ export default function History() {
             )}
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={() => window.location.reload()} className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+            <button onClick={() => window.location.reload()} className="p-2 text-blue-600 hover:text-blue-700 transition-colors">
               <RefreshCw size={18} />
             </button>
             <NotificationBell />
@@ -200,8 +200,14 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
           <div className="flex items-center gap-1 flex-wrap">
             <span className="font-bold text-black">{inc.user?.name}</span>
             <span className="text-xs text-gray-600">{inc.user?.team}팀</span>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${REASON_COLORS[inc.reason] || "bg-gray-100 text-gray-800"}`}>{inc.reason}</span>
-            <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{inc.shift}</span>
+            {/* 사유 배지 - 지각/조퇴시 시간 정보 포함 */}
+            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${REASON_COLORS[inc.reason] || "bg-gray-100 text-gray-800"}`}>
+              {inc.reason}
+              {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && (
+                <span className="ml-1 text-orange-600">{inc.startTime}~{inc.endTime}</span>
+              )}
+            </span>
+            {inc.shift && <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{inc.shift}</span>}
             {inc.duty && <span className="text-xs bg-indigo-50 text-indigo-600 font-medium px-2 py-0.5 rounded-full">{inc.duty}</span>}
           </div>
           <p className="text-xs text-gray-600 mt-1">{formatDateKo(inc.date + "T00:00:00")}</p>
@@ -216,7 +222,24 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
 
       {/* 대체 정보 */}
       <div className="mt-3 pt-3 border-t border-gray-100">
-        {isDuty ? (
+        {inc.reason === "지각" || inc.reason === "조퇴" ? (
+          // 지각/조퇴: 대체근무자 표시
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-1.5 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 w-14">
+                  {inc.reason === "지각" ? "지각" : "조퇴"}
+                </span>
+                <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
+              </div>
+            </div>
+              <button onClick={onAddSub}
+                className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
+                <UserPlus size={12} />
+                대체자 등록
+              </button>
+          </div>
+        ) : isDuty ? (
           // 당번: 주간/야간 각각 표시
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col gap-1.5 flex-1">

@@ -115,6 +115,8 @@ export const create = mutation({
     duty: v.optional(v.string()),
     note: v.optional(v.string()),
     registeredBy: v.optional(v.id("users")),
+    startTime: v.optional(v.string()),
+    endTime: v.optional(v.string()),
     substituteUserId: v.optional(v.id("users")),       // 주간 or 일반
     substituteUserIdNight: v.optional(v.id("users")),  // 야간 (당번 전용)
   },

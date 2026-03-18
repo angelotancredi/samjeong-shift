@@ -173,7 +173,11 @@ export default function Home() {
                         <div className="flex items-center gap-2 mb-2">
                           <RankBadge rank={inc.user?.rank} size="sm" />
                           <span className="text-sm font-medium text-black">{inc.user?.name}</span>
-                          <span className="text-xs text-gray-500">({inc.reason} · {inc.shift})</span>
+                          <span className="text-xs text-gray-500">
+                            ({inc.reason}
+                            {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && ` ${inc.startTime}~${inc.endTime}`}
+                            {inc.shift && ` · ${inc.shift}`})
+                          </span>
                           {inc.duty && <span className="text-xs bg-indigo-50 text-indigo-600 font-medium px-2 py-0.5 rounded-full">{inc.duty}</span>}
                         </div>
                         <SubstituteDisplay inc={inc} onAddSub={() => setAddSubIncident(inc)} />
@@ -253,8 +257,13 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
                         <p className="text-xs text-gray-700">{inc.user?.team}팀 · {inc.user?.rank}</p>
                       </div>
                       <div className="flex gap-1.5 shrink-0">
-                        <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-1 rounded-full">{inc.reason}</span>
-                        <span className="text-xs bg-gray-200 text-gray-600 font-medium px-2 py-1 rounded-full">{inc.shift}</span>
+                        <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-1 rounded-full">
+                          {inc.reason}
+                          {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && (
+                            <span className="ml-1">{inc.startTime}~{inc.endTime}</span>
+                          )}
+                        </span>
+                        {inc.shift && <span className="text-xs bg-gray-200 text-gray-600 font-medium px-2 py-1 rounded-full">{inc.shift}</span>}
                         {inc.duty && <span className="text-xs bg-indigo-50 text-indigo-600 font-medium px-2 py-1 rounded-full">{inc.duty}</span>}
                       </div>
                     </div>
@@ -275,10 +284,31 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
 // 대체근무자 표시 (당번: 주간/야간 분리, 그 외: 단일)
 function SubstituteDisplay({ inc, onAddSub }) {
   const isDuty = inc.shift === "당번";
+  const isLateLeave = inc.reason === "지각" || inc.reason === "조퇴";
   const daySub = inc.substitutes?.find((s) => s.subShift === "주간");
   const nightSub = inc.substitutes?.find((s) => s.subShift === "야간");
   const singleSub = !isDuty && inc.substitutes?.[0];
   const hasAll = isDuty ? (daySub && nightSub) : singleSub;
+
+  // 지각/조퇴 처리
+  if (isLateLeave) {
+    const label = inc.reason === "지각" ? "지각" : "조퇴";
+    return (
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1.5 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 w-14">{label}</span>
+            <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
+          </div>
+        </div>
+        <button onClick={onAddSub}
+          className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
+          <UserPlus size={12} />
+          대체자 등록
+        </button>
+      </div>
+    );
+  }
 
   if (isDuty) {
     return (
