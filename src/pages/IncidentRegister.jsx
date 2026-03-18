@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Search, Check } from "lucide-react";
+import { ChevronLeft, Search, Check, Calendar } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../context/AuthContext";
@@ -274,13 +274,23 @@ function Step1({ form, update, profile }) {
       </div>
 
       <div className="bg-white rounded-2xl p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold text-black">날짜</h3>
-          <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">{formatDateKo(form.date)}</span>
+        <h3 className="font-bold text-black mb-3">날짜</h3>
+        <div className="relative group">
+          {/* 실제 날짜 선택은 투명한 input을 통해 수행 */}
+          <input 
+            type="date" 
+            value={form.date} 
+            onChange={(e) => update("date", e.target.value)}
+            className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+          />
+          {/* 화면에 보여지는 예쁜 포맷 */}
+          <div className="w-full px-4 py-3 bg-gray-50 rounded-xl flex items-center justify-between border border-transparent group-focus-within:border-blue-500 transition-all">
+            <span className="text-sm font-semibold text-gray-900">
+              {form.date ? `${form.date} (${["일","월","화","수","목","금","토"][new Date(form.date).getDay()]})` : "날짜를 선택하세요"}
+            </span>
+            <Calendar size={18} className="text-gray-400" />
+          </div>
         </div>
-        <input type="date" value={form.date} onChange={(e) => update("date", e.target.value)}
-          lang="ko"
-          className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
 
       <div className="bg-white rounded-2xl p-4 shadow-sm">
