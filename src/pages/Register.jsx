@@ -46,7 +46,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <div className="flex items-center gap-3 px-4 pt-7 pb-4">
+      <div className="flex items-center gap-3 px-4 pt-14 pb-4">
         <button onClick={() => navigate("/login")} className="p-2 rounded-full hover:bg-gray-100">
           <ChevronLeft size={22} className="text-gray-900" />
         </button>
