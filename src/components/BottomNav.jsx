@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, List, User, Settings } from "lucide-react";
+import { Home, List, User, Settings, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const navItems = [
@@ -11,7 +11,7 @@ const navItems = [
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile } = useAuth();
+  const { profile, logout } = useAuth();
 
   const items = profile?.isAdmin
     ? [...navItems, { path: "/admin", icon: Settings, label: "관리자" }]
@@ -41,6 +41,14 @@ export default function BottomNav() {
             </button>
           );
         })}
+        {/* 로그아웃 버튼 추가 */}
+        <button
+          onClick={() => { if(window.confirm("로그아웃 하시겠습니까?")) { logout(); navigate("/login"); } }}
+          className="flex-1 flex flex-col items-center gap-0.5 py-2.5 text-gray-400 hover:text-red-500 transition-colors"
+        >
+          <LogOut size={22} strokeWidth={1.8} />
+          <span className="text-[10px] font-medium">로그아웃</span>
+        </button>
       </div>
     </div>
   );

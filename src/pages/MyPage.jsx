@@ -38,15 +38,27 @@ export default function MyPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="bg-white px-5 pt-7 pb-5 shadow-sm">
+      <div className="bg-white px-5 pt-6 pb-4 sticky top-0 z-30 shadow-sm">
+        {/* 1단: 상단 정보 영역 (표준) */}
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-lg font-bold text-black">내 정보</h1>
-          <div className="flex items-center gap-1">
-            <NotificationBell />
-            <button onClick={handleLogout} className="p-2 rounded-full hover:bg-gray-100">
-              <LogOut size={20} className="text-gray-700" />
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+            <p className="text-xs text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
           </div>
+          <div className="flex items-center gap-2">
+            {profile && (
+              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
+                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+              </div>
+            )}
+            <NotificationBell />
+          </div>
+        </div>
+
+        {/* 2단: 페이지 타이틀 */}
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="text-lg font-bold text-black tracking-tight">내 기록</h1>
         </div>
         <div className="flex items-center gap-4 bg-gray-50 rounded-2xl p-4">
           <RankBadge rank={profile?.rank} size="lg" />

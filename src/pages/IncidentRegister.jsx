@@ -175,16 +175,36 @@ export default function IncidentRegister() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <div className="bg-white px-4 pt-7 pb-4 shadow-sm">
-        <div className="flex items-center gap-3">
-          <button onClick={() => step === 1 ? navigate("/") : setStep(1)} className="p-2 rounded-full hover:bg-gray-100">
-            <ChevronLeft size={22} className="text-gray-900" />
+      <div className="bg-white px-5 pt-6 pb-4 sticky top-0 z-30 shadow-sm">
+        {/* 1단: 상단 정보 영역 (표준) */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+            <p className="text-xs text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {profile && (
+              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
+                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+              </div>
+            )}
+            <NotificationBell size={18} />
+          </div>
+        </div>
+
+        {/* 2단: 뒤로가기 및 타이틀 */}
+        <div className="flex items-center gap-3 mb-3">
+          <button onClick={() => step === 1 ? navigate("/") : setStep(1)} className="p-1 -ml-1 rounded-full hover:bg-gray-100">
+            <ChevronLeft size={24} className="text-gray-900" />
           </button>
-          <h1 className="text-lg font-bold text-black">
+          <h1 className="text-lg font-bold text-black tracking-tight">
             {step === 1 ? "사고자 등록" : "대체근무자 지정"}
           </h1>
         </div>
-        <div className="flex gap-2 mt-3 px-2">
+
+        {/* 진행 상태 바 */}
+        <div className="flex gap-2 px-1">
           <div className={`flex-1 h-1.5 rounded-full ${step >= 1 ? "bg-blue-600" : "bg-gray-200"}`} />
           <div className={`flex-1 h-1.5 rounded-full ${step >= 2 ? "bg-blue-600" : "bg-gray-200"}`} />
         </div>

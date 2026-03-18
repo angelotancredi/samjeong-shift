@@ -50,19 +50,36 @@ export default function History() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      <div className="bg-white px-5 pt-7 pb-4 sticky top-0 z-30 shadow-sm">
-        <div className="flex items-center justify-between mb-3">
-          <h1 className="text-lg font-bold text-black">전체 현황</h1>
-          <div className="flex items-center gap-1">
-            <button onClick={() => setShowFilter(!showFilter)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition-colors ${filterReason || filterTeam || filterDuty ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}`}>
-              <Filter size={13} />
-              필터{(filterReason || filterTeam || filterDuty) ? " ON" : ""}
-            </button>
+      <div className="bg-white px-5 pt-6 pb-4 sticky top-0 z-30 shadow-sm">
+        {/* 1단: 상단 정보 영역 (표준) */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+            <p className="text-xs text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {profile && (
+              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
+                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+              </div>
+            )}
             <NotificationBell />
           </div>
         </div>
-        <div className="flex items-center justify-between">
+
+        {/* 2단: 페이지 타이틀 및 필터 */}
+        <div className="flex items-center justify-between mb-3">
+          <h1 className="text-lg font-bold text-black tracking-tight">전체 현황</h1>
+          <button onClick={() => setShowFilter(!showFilter)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition-colors ${filterReason || filterTeam || filterDuty ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}`}>
+            <Filter size={13} />
+            필터{(filterReason || filterTeam || filterDuty) ? " ON" : ""}
+          </button>
+        </div>
+
+        {/* 날짜 네비게이션 */}
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
           <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-1.5 rounded-full hover:bg-gray-100">
             <ChevronLeft size={18} className="text-gray-800" />
           </button>
