@@ -297,23 +297,25 @@ function SubstituteDisplay({ inc, onAddSub }) {
 
   if (isDuty) {
     return (
-      <div className="flex flex-col gap-1.5">
-        {[{ label:"🌞 주간", sub: daySub }, { label:"🌙 야간", sub: nightSub }].map(({ label, sub }) => (
-          <div key={label} className="flex items-center gap-2">
-            <span className="text-xs text-gray-500 w-14">{label}</span>
-            {sub ? (
-              <div className="flex items-center gap-1.5">
-                <RankBadge rank={sub.user?.rank} size="sm" />
-                <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
-              </div>
-            ) : (
-              <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
-            )}
-          </div>
-        ))}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1.5 flex-1">
+          {[{ label:"🌞 주간", sub: daySub }, { label:"🌙 야간", sub: nightSub }].map(({ label, sub }) => (
+            <div key={label} className="flex items-center gap-2">
+              <span className="text-xs text-gray-500 w-14">{label}</span>
+              {sub ? (
+                <div className="flex items-center gap-1.5">
+                  <RankBadge rank={sub.user?.rank} size="sm" />
+                  <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
+                </div>
+              ) : (
+                <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
+              )}
+            </div>
+          ))}
+        </div>
         {!hasAll && (
           <button onClick={onAddSub}
-            className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full self-end mt-0.5">
+            className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
             <UserPlus size={12} />
             대체자 등록
           </button>

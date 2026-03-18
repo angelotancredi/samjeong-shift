@@ -211,12 +211,14 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
       <div className="mt-3 pt-3 border-t border-gray-100">
         {isDuty ? (
           // 당번: 주간/야간 각각 표시
-          <div className="flex flex-col gap-1.5">
-            <SubRow label="🌞 주간" sub={daySub} missing={!daySub} />
-            <SubRow label="🌙 야간" sub={nightSub} missing={!nightSub} />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-1.5 flex-1">
+              <SubRow label="🌞 주간" sub={daySub} missing={!daySub} />
+              <SubRow label="🌙 야간" sub={nightSub} missing={!nightSub} />
+            </div>
             {isPartialOrMissing && (
               <button onClick={onAddSub}
-                className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full self-end mt-1">
+                className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
                 <UserPlus size={12} />
                 대체자 등록
               </button>
