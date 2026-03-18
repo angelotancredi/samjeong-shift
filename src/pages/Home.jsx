@@ -169,8 +169,8 @@ export default function Home() {
                 ) : (
                   <div className="flex flex-col gap-2">
                     {todayIncidents.map((inc) => (
-                      <div key={inc._id} className="bg-gray-50 rounded-xl p-3">
-                        <div className="flex items-center gap-2 mb-2">
+                      <div key={inc._id} className="bg-gray-50 rounded-xl p-2">
+                        <div className="flex items-center gap-2 mb-0.5">
                           <RankBadge rank={inc.user?.rank} size="sm" />
                           <span className="text-sm font-medium text-black">{inc.user?.name}</span>
                           <span className="text-xs text-gray-500">
@@ -229,7 +229,7 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       <div className="absolute inset-0 bg-black/40 animate-fade-in" onClick={onClose} />
-      <div className="relative mt-auto bg-white rounded-t-[32px] h-[60vh] flex flex-col animate-slide-up shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+      <div className="relative mt-auto bg-white rounded-t-[32px] h-[80vh] flex flex-col animate-slide-up shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
         <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-3 mb-1" />
         <div className="px-5 py-4 border-b border-gray-100">
           <div className="flex items-center justify-between">
@@ -295,7 +295,7 @@ function SubstituteDisplay({ inc, onAddSub }) {
     const label = inc.reason === "지각" ? "지각" : "조퇴";
     return (
       <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1.5 flex-1">
+        <div className="flex flex-col gap-1 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500 w-14">{label}</span>
             <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
@@ -313,7 +313,7 @@ function SubstituteDisplay({ inc, onAddSub }) {
   if (isDuty) {
     return (
       <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1.5 flex-1">
+        <div className="flex flex-col gap-1 flex-1">
           {[{ label:"🌞 주간", sub: daySub }, { label:"🌙 야간", sub: nightSub }].map(({ label, sub }) => (
             <div key={label} className="flex items-center gap-2">
               <span className="text-xs text-gray-500 w-14">{label}</span>
@@ -342,7 +342,7 @@ function SubstituteDisplay({ inc, onAddSub }) {
   if (singleSub) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-500">대체</span>
+        <span className="text-xs text-gray-500 w-14">대체</span>
         <RankBadge rank={singleSub.user?.rank} size="sm" />
         <span className="text-sm font-medium text-gray-900">{singleSub.user?.name}</span>
         <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>

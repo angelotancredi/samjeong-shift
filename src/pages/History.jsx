@@ -193,7 +193,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
   const removeSubstitute = useMutation(api.substitutes.removeSubstitute);
 
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-sm">
+    <div className="bg-white rounded-2xl p-3 shadow-sm">
       <div className="flex items-start gap-3">
         <RankBadge rank={inc.user?.rank} size="md" />
         <div className="flex-1 min-w-0">
@@ -221,11 +221,11 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
       </div>
 
       {/* 대체 정보 */}
-      <div className="mt-3 pt-3 border-t border-gray-100">
+      <div className="mt-1 pt-2 border-t border-gray-100">
         {inc.reason === "지각" || inc.reason === "조퇴" ? (
           // 지각/조퇴: 대체근무자 표시
           <div className="flex items-center justify-between gap-4">
-            <div className="flex flex-col gap-1.5 flex-1">
+            <div className="flex flex-col gap-1 flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-xs text-gray-500 w-14">
                   {inc.reason === "지각" ? "지각" : "조퇴"}
@@ -242,7 +242,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
         ) : isDuty ? (
           // 당번: 주간/야간 각각 표시
           <div className="flex items-center justify-between gap-4">
-            <div className="flex flex-col gap-1.5 flex-1">
+            <div className="flex flex-col gap-1 flex-1">
               <SubRow label="주간" sub={daySub} missing={!daySub}
                 onRemove={daySub ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "주간" }) : undefined} />
               <SubRow label="야간" sub={nightSub} missing={!nightSub}
