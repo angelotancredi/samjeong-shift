@@ -81,25 +81,40 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-white px-5 pt-7 pb-4 sticky top-0 z-30 shadow-sm">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1">
-            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-1 rounded-full hover:bg-gray-100">
-              <ChevronLeft size={18} className="text-gray-700" />
-            </button>
-            <h2 className="text-base font-bold text-black whitespace-nowrap">{year}년 {month + 1}월</h2>
-            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-1 rounded-full hover:bg-gray-100">
-              <ChevronRight size={18} className="text-gray-700" />
-            </button>
+      <div className="bg-white px-5 pt-6 pb-4 sticky top-0 z-30 shadow-sm">
+        {/* 상단 정보 영역 */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+            <p className="text-xs text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
           </div>
-          <div className="flex items-center gap-1.5">
-            <p className="text-xs text-gray-600 font-medium whitespace-nowrap">삼정119안전센터</p>
+          <div className="flex items-center gap-2">
+            {profile && (
+              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
+                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+              </div>
+            )}
             <NotificationBell />
           </div>
         </div>
-        <div className="grid grid-cols-7">
+
+        {/* 네비게이션 영역 */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-1 rounded-full hover:bg-gray-100 active:scale-90 transition-transform">
+              <ChevronLeft size={20} className="text-gray-900" />
+            </button>
+            <h2 className="text-lg font-bold text-black tracking-tight">{year}년 {month + 1}월</h2>
+            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-1 rounded-full hover:bg-gray-100 active:scale-90 transition-transform">
+              <ChevronRight size={20} className="text-gray-900" />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-7 border-t border-gray-50 pt-2">
           {["일","월","화","수","목","금","토"].map((d, i) => (
-            <div key={d} className={`text-center text-xs font-medium py-1 ${i===0?"text-red-400":i===6?"text-blue-400":"text-gray-600"}`}>{d}</div>
+            <div key={d} className={`text-center text-[10px] font-bold py-1 ${i===0?"text-red-400":i===6?"text-blue-400 text-opacity-80":"text-gray-400 uppercase"}`}>{d}</div>
           ))}
         </div>
       </div>
