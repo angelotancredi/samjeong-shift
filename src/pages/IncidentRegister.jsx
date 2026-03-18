@@ -151,7 +151,7 @@ export default function IncidentRegister() {
               {!form.sub_day && !form.sub_night && (
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-medium text-gray-500">대체자</span>
-                  <span className="text-sm text-gray-400">미정</span>
+                  <span className="text-sm font-bold text-orange-400">대체자 미정</span>
                 </div>
               )}
             </>
@@ -286,7 +286,7 @@ function Step1({ form, update, profile }) {
           {/* 화면에 보여지는 예쁜 포맷 */}
           <div className="w-full px-4 py-3 bg-gray-50 rounded-xl flex items-center justify-between border border-transparent group-focus-within:border-blue-500 transition-all">
             <span className="text-sm font-semibold text-gray-900">
-              {form.date ? `${form.date} (${["일","월","화","수","목","금","토"][new Date(form.date).getDay()]})` : "날짜를 선택하세요"}
+              {form.date ? `${form.date} (${["일","월","화","수","목","금","토"][new Date(form.date).getDay()]})` : "날짜 선택 (대체자 미정)"}
             </span>
             <Calendar size={18} className="text-gray-400" />
           </div>
@@ -420,7 +420,7 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
           <h3 className="font-bold text-black">
             {activeSlot === "day" ? "🌞 주간" : "🌙 야간"} 대체근무자 선택
           </h3>
-          <span className="text-xs text-gray-400">(선택 안 하면 미정)</span>
+          <span className="text-xs text-gray-400">(선택 안 하면 대체자 미정)</span>
         </div>
         <div className="relative mb-3">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -481,7 +481,7 @@ function Step2Single({ form, update, searchQuery, setSearchQuery, filteredUsers 
 
       <div className="bg-white rounded-2xl p-4 shadow-sm">
         <h3 className="font-bold text-black mb-1">대체근무자 선택</h3>
-        <p className="text-xs text-gray-600 mb-3">선택하지 않으면 미정으로 등록됩니다</p>
+        <p className="text-xs text-orange-400 font-medium mb-3">선택하지 않으면 대체자 미정으로 등록됩니다</p>
         <div className="relative mb-3">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}

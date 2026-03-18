@@ -105,7 +105,7 @@ export default function MyPage() {
                   <RankBadge rank={inc.substitutes[0].user?.rank} size="sm" />
                   <span className="text-sm font-medium text-gray-900">{inc.substitutes[0].user?.name}</span>
                 </div>
-              ) : <span className="text-xs bg-orange-50 text-orange-400 font-medium px-2 py-1 rounded-full mt-2 inline-block">대체자 미정</span>}
+              ) : <span className="text-xs bg-orange-50 text-orange-400 font-bold px-3 py-1 rounded-full mt-2 inline-block">대체자 미정</span>}
             </div>
           ))
         ) : (
