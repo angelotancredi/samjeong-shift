@@ -23,6 +23,7 @@ export default function Home() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
+  const [addSubIncident, setAddSubIncident] = useState(null); // 추가: 오늘 현황에서도 사용하도록 이동
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -86,13 +87,13 @@ export default function Home() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-            <p className="text-xs text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
+            <p className="text-sm text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
           </div>
           <div className="flex items-center gap-2">
             {profile && (
-              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
-                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
-                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100 shadow-sm">
+                <span className="text-xs text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-xs text-gray-900 font-bold">{profile.name}</span>
               </div>
             )}
             <NotificationBell />
@@ -190,7 +191,7 @@ export default function Home() {
                           <span className="text-xs text-gray-500">({inc.reason} · {inc.shift})</span>
                           {inc.duty && <span className="text-xs bg-indigo-50 text-indigo-600 font-medium px-2 py-0.5 rounded-full">{inc.duty}</span>}
                         </div>
-                        <SubstituteDisplay inc={inc} onAddSub={() => navigate("/history")} />
+                        <SubstituteDisplay inc={inc} onAddSub={() => setAddSubIncident(inc)} />
                       </div>
                     ))}
                   </div>
@@ -216,6 +217,15 @@ export default function Home() {
           cycleBase={cycleBase}
           onClose={() => setShowModal(false)}
           onAdd={() => { setShowModal(false); navigate("/incident-register", { state: { date: toDateString(selectedDate) } }); }}
+          setAddSubIncident={setAddSubIncident}
+        />
+      )}
+      {addSubIncident && (
+        <AddSubstituteModal
+          incident={addSubIncident}
+          users={allUsers}
+          onClose={() => setAddSubIncident(null)}
+          onDone={() => setAddSubIncident(null)}
         />
       )}
       <BottomNav />
@@ -223,10 +233,9 @@ export default function Home() {
   );
 }
 
-function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd }) {
+function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAddSubIncident }) {
   const dutyTeam = cycleBase ? getDutyTeam(date, cycleBase) : null;
   const tc = dutyTeam ? { 1:{text:"text-blue-700"}, 2:{text:"text-emerald-700"}, 3:{text:"text-violet-700"} }[dutyTeam] : null;
-  const [addSubIncident, setAddSubIncident] = useState(null);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
@@ -274,15 +283,6 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd }) {
           )}
         </div>
       </div>
-
-      {addSubIncident && (
-        <AddSubstituteModal
-          incident={addSubIncident}
-          users={allUsers}
-          onClose={() => setAddSubIncident(null)}
-          onDone={() => setAddSubIncident(null)}
-        />
-      )}
     </div>
   );
 }

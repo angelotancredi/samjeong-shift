@@ -84,10 +84,27 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
-      <div className="bg-white px-5 pt-7 pb-5 sticky top-0 z-30 shadow-sm">
+      <div className="bg-white px-5 pt-6 pb-4 sticky top-0 z-30 shadow-sm">
+        {/* 1단: 상단 정보 영역 (표준) */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+            <p className="text-sm text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {profile && (
+              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100 shadow-sm">
+                <span className="text-xs text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-xs text-gray-900 font-bold">{profile.name}</span>
+              </div>
+            )}
+            <NotificationBell />
+          </div>
+        </div>
+
+        {/* 2단: 페이지 타이틀 */}
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-lg font-bold text-black">관리자</h1>
-          <NotificationBell />
+          <h1 className="text-lg font-bold text-black tracking-tight">관리 설정</h1>
         </div>
         <div className="flex gap-1.5">
           {[

@@ -55,13 +55,13 @@ export default function History() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-            <p className="text-xs text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
+            <p className="text-sm text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
           </div>
           <div className="flex items-center gap-2">
             {profile && (
-              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100">
-                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
-                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100 shadow-sm">
+                <span className="text-xs text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-xs text-gray-900 font-bold">{profile.name}</span>
               </div>
             )}
             <NotificationBell />
