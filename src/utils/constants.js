@@ -27,12 +27,18 @@ export const DUTY_ROLES = [
  * 당번 사이클 계산: 당번 → 비번 → 비번 (3일 반복)
  * cycleBase: { baseDate: "YYYY-MM-DD", baseTeam: 1|2|3 }
  */
+function parseDate(d) {
+  if (typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d)) {
+    const [y, m, day] = d.split("-").map(Number);
+    return new Date(y, m - 1, day);
+  }
+  return new Date(d);
+}
+
 export function getDutyTeam(date, cycleBase) {
   if (!cycleBase?.baseDate) return null;
-  const base = new Date(cycleBase.baseDate);
-  base.setHours(0, 0, 0, 0);
-  const target = new Date(date);
-  target.setHours(0, 0, 0, 0);
+  const base = parseDate(cycleBase.baseDate);
+  const target = parseDate(date);
   const diffDays = Math.round((target - base) / (1000 * 60 * 60 * 24));
   const mod = ((diffDays % 3) + 3) % 3;
   const teamIndex = (cycleBase.baseTeam - 1 + mod) % 3;

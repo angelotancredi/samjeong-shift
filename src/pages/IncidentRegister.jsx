@@ -272,6 +272,7 @@ function Step1({ form, update, profile }) {
       <div className="bg-white rounded-2xl p-4 shadow-sm">
         <h3 className="font-bold text-black mb-3">날짜</h3>
         <input type="date" value={form.date} onChange={(e) => update("date", e.target.value)}
+          lang="ko"
           className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
 
