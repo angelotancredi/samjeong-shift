@@ -274,10 +274,13 @@ function Step1({ form, update, profile }) {
       </div>
 
       <div className="bg-white rounded-2xl p-4 shadow-sm">
-        <h3 className="font-bold text-black mb-3">날짜</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-bold text-black">날짜</h3>
+          <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">{formatDateKo(form.date)}</span>
+        </div>
         <input type="date" value={form.date} onChange={(e) => update("date", e.target.value)}
           lang="ko"
-          className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" />
       </div>
 
       <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -356,7 +359,7 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
           <RankBadge rank={form.incident_user?.rank} size="md" />
           <div>
             <p className="font-semibold text-black">{form.incident_user?.name}</p>
-            <p className="text-xs text-gray-700">{form.date} · {form.reason} · {form.shift}</p>
+            <p className="text-xs text-gray-700">{formatDateKo(form.date)} · {form.reason} · {form.shift}</p>
           </div>
         </div>
       </div>
@@ -461,7 +464,7 @@ function Step2Single({ form, update, searchQuery, setSearchQuery, filteredUsers 
           <RankBadge rank={form.incident_user?.rank} size="md" />
           <div>
             <p className="font-semibold text-black">{form.incident_user?.name}</p>
-            <p className="text-xs text-gray-700">{form.date} · {form.reason} · {form.shift}</p>
+            <p className="text-xs text-gray-700">{formatDateKo(form.date)} · {form.reason} · {form.shift}</p>
           </div>
         </div>
       </div>
