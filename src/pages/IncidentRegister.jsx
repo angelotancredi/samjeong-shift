@@ -391,7 +391,7 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
               <span className="text-sm font-bold text-black truncate">{form.sub_day.name}</span>
             </div>
           ) : (
-            <p className="text-sm text-gray-400">미정</p>
+            <p className="text-sm font-bold text-orange-400">대체자 미정</p>
           )}
         </button>
         <button
@@ -409,7 +409,7 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
               <span className="text-sm font-bold text-black truncate">{form.sub_night.name}</span>
             </div>
           ) : (
-            <p className="text-sm text-gray-400">미정</p>
+            <p className="text-sm font-bold text-orange-400">대체자 미정</p>
           )}
         </button>
       </div>
