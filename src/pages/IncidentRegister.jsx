@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../context/AuthContext";
 import RankBadge from "../components/RankBadge";
+import NotificationBell from "../components/NotificationBell";
 import { SHIFT_TYPES, ABSENCE_REASONS, DUTY_ROLES, toDateString, formatDateKo } from "../utils/constants";
 
 export default function IncidentRegister() {
