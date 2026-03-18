@@ -73,7 +73,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative mt-auto bg-white rounded-t-3xl max-h-[80vh] flex flex-col">
+      <div className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col">
         <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-3 mb-1" />
 
         {/* 헤더 */}

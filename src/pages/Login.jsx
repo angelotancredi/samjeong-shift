@@ -27,7 +27,7 @@ export default function Login() {
       await login(name.trim(), pin);
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      setError("이름 또는 PIN 번호가 틀렸습니다.");
     } finally {
       setLoading(false);
     }

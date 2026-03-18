@@ -177,7 +177,7 @@ export default function IncidentRegister() {
             <ChevronLeft size={22} className="text-gray-900" />
           </button>
           <h1 className="text-lg font-bold text-black">
-            {step === 1 ? "사고 등록" : "대체근무자 지정"}
+            {step === 1 ? "사고자 등록" : "대체근무자 지정"}
           </h1>
         </div>
         <div className="flex gap-2 mt-3 px-2">
@@ -186,7 +186,7 @@ export default function IncidentRegister() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-5 pb-32">
+      <div className="flex-1 overflow-y-auto scrollbar-hide px-4 py-5 pb-44">
         {step === 1 ? (
           <Step1 form={form} update={update} profile={profile} />
         ) : isDuty ? (
@@ -209,7 +209,7 @@ export default function IncidentRegister() {
       </div>
 
       {/* 하단 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-4 safe-bottom">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 pt-4 pb-10 safe-bottom">
         {step === 1 ? (
           <button
             onClick={() => {
@@ -508,8 +508,7 @@ function DutySelector({ value, onChange }) {
 
   // 업무 카테고리 그룹핑
   const groups = [
-    { label: "지휘", items: ["팀장"] },
-    { label: "1선 펌프", items: ["1선펌프기관", "1선펌프경방"] },
+    { label: "1선 펌프", items: ["팀장", "1선펌프기관", "1선펌프경방"] },
     { label: "2선 펌프", items: ["2선펌프기관", "2선펌프경방"] },
     { label: "구급", items: ["구급기관", "구급경방"] },
     { label: "특수차량", items: ["물탱크기관", "굴절기관", "고가기관", "화학차기관"] },
@@ -544,7 +543,7 @@ function DutySelector({ value, onChange }) {
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col">
           <div className="absolute inset-0 bg-black/30" onClick={() => setOpen(false)} />
-          <div className="relative mt-auto bg-white rounded-t-3xl max-h-[70vh] flex flex-col">
+          <div className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col">
             {/* 핸들 */}
             <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-3 mb-1 flex-shrink-0" />
 
@@ -568,7 +567,7 @@ function DutySelector({ value, onChange }) {
               {groups.map((group) => (
                 <div key={group.label} className="mb-4">
                   {/* 그룹 라벨 */}
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">
+                  <p className="text-xs font-bold text-amber-500 uppercase tracking-wider mb-2 px-1">
                     {group.label}
                   </p>
                   <div className="flex flex-col gap-1">

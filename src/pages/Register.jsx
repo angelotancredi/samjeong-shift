@@ -38,7 +38,7 @@ export default function Register() {
       });
       navigate("/login", { state: { message: "가입 완료! 로그인해주세요." } });
     } catch (err) {
-      setError(err.message || "가입 중 오류가 발생했습니다.");
+      setError("가입 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     } finally {
       setLoading(false);
     }
@@ -81,7 +81,7 @@ export default function Register() {
             <div className="grid grid-cols-5 gap-2">
               {RANKS.map((r) => (
                 <button type="button" key={r} onClick={() => update("rank", r)}
-                  className={`py-2.5 rounded-xl text-sm font-medium transition-all ${form.rank === r ? "bg-blue-600 text-white shadow-sm" : "bg-gray-50 text-gray-800 border border-gray-100"}`}>
+                  className={`py-2.5 rounded-xl text-sm font-medium transition-all ${form.rank === r ? "bg-indigo-600 text-white shadow-md scale-[1.02]" : "bg-gray-50 text-gray-800 border border-gray-100 hover:bg-gray-100"}`}>
                   {r.replace("소방", "")}
                 </button>
               ))}
@@ -93,7 +93,7 @@ export default function Register() {
             <div className="grid grid-cols-3 gap-3">
               {TEAMS.map((t) => (
                 <button type="button" key={t} onClick={() => update("team", String(t))}
-                  className={`py-3 rounded-xl text-sm font-semibold transition-all ${form.team === String(t) ? "bg-blue-600 text-white shadow-sm" : "bg-gray-50 text-gray-800 border border-gray-100"}`}>
+                  className={`py-3 rounded-xl text-sm font-bold transition-all ${form.team === String(t) ? "bg-orange-500 text-white shadow-md scale-[1.02]" : "bg-gray-50 text-gray-800 border border-gray-100 hover:bg-gray-100"}`}>
                   {t}팀
                 </button>
               ))}
