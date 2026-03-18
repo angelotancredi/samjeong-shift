@@ -30,7 +30,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
       u._id !== incident?.userId &&
       (u.name.includes(search) || String(u.team).includes(search) || u.rank.includes(search))
     )
-    .sort((a, b) => a.team - b.team || a.name.localeCompare(b.name));
+    .sort((a, b) => a.team - b.team || (a.name || "").localeCompare(b.name || ""));
 
   const handleSelectDuty = (u) => {
     if (activeSlot === "day") {

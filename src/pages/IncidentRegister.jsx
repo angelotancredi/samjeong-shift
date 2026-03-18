@@ -66,7 +66,7 @@ export default function IncidentRegister() {
       u._id !== profile?._id &&
       (u.name.includes(searchQuery) || String(u.team).includes(searchQuery) || u.rank.includes(searchQuery))
     )
-    .sort((a, b) => a.team - b.team || a.name.localeCompare(b.name));
+    .sort((a, b) => a.team - b.team || (a.name || "").localeCompare(b.name || ""));
 
   const handleSubmit = async () => {
     if (!form.date || !form.shift || !form.reason) {

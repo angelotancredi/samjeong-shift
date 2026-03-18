@@ -134,7 +134,7 @@ export default function Admin() {
             {[1, 2, 3].map((team) => {
               const teamUsers = allUsers
                 .filter((u) => u.team === team)
-                .sort((a, b) => a.name.localeCompare(b.name));
+                .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
               if (!teamUsers.length) return null;
               const teamStyle = {
                 1: { header: "bg-blue-50", title: "text-blue-700" },
