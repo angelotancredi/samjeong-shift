@@ -14,12 +14,12 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
   const existingNight = incident?.substitutes?.find((s) => s.subShift === "야간");
   const existingSingle = !isDuty && incident?.substitutes?.[0];
 
-  const [selectedId, setSelectedId] = useState(existingSingle?.substituteUserId ?? null);
+  const [selectedId, setSelectedId] = useState(existingSingle?.user?._id ?? existingSingle?.substituteUserId ?? null);
 
   const [activeSlot, setActiveSlot] = useState("day");
-  const [dayId, setDayId] = useState(existingDay?.substituteUserId ?? null);
+  const [dayId, setDayId] = useState(existingDay?.user?._id ?? existingDay?.substituteUserId ?? null);
   const [dayUser, setDayUser] = useState(existingDay?.user ?? null);
-  const [nightId, setNightId] = useState(existingNight?.substituteUserId ?? null);
+  const [nightId, setNightId] = useState(existingNight?.user?._id ?? existingNight?.substituteUserId ?? null);
   const [nightUser, setNightUser] = useState(existingNight?.user ?? null);
 
   const [search, setSearch] = useState("");
@@ -99,7 +99,11 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                 activeSlot === "day" ? "border-blue-500 bg-blue-50" : "border-gray-100 bg-gray-50"
               }`}
             >
-              <p className={`text-xs font-bold mb-1 ${activeSlot === "day" ? "text-blue-500" : "text-gray-400"}`}>주간</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className={`text-xs font-bold ${activeSlot === "day" ? "text-blue-500" : "text-gray-400"}`}>주간</p>
+                {dayUser && <button type="button" onClick={(e) => { e.stopPropagation(); setDayId(null); setDayUser(null); }}
+                  className="text-gray-300 hover:text-red-400 text-xs font-bold leading-none">✕</button>}
+              </div>
               {dayUser ? (
                 <div className="flex items-center gap-1.5">
                   <RankBadge rank={dayUser.rank} size="sm" />
@@ -115,7 +119,11 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                 activeSlot === "night" ? "border-violet-500 bg-violet-50" : "border-gray-100 bg-gray-50"
               }`}
             >
-              <p className={`text-xs font-bold mb-1 ${activeSlot === "night" ? "text-violet-500" : "text-gray-400"}`}>야간</p>
+              <div className="flex items-center justify-between mb-1">
+                <p className={`text-xs font-bold ${activeSlot === "night" ? "text-violet-500" : "text-gray-400"}`}>야간</p>
+                {nightUser && <button type="button" onClick={(e) => { e.stopPropagation(); setNightId(null); setNightUser(null); }}
+                  className="text-gray-300 hover:text-red-400 text-xs font-bold leading-none">✕</button>}
+              </div>
               {nightUser ? (
                 <div className="flex items-center gap-1.5">
                   <RankBadge rank={nightUser.rank} size="sm" />

@@ -78,3 +78,30 @@ export const addSubstituteDuty = mutation({
     await sendNotification(ctx, incident, message);
   },
 });
+
+// 대체자 단건 삭제
+export const removeSubstitute = mutation({
+  args: { incidentId: v.id("incidents"), subShift: v.optional(v.string()) },
+  handler: async (ctx, { incidentId, subShift }) => {
+    const subs = await ctx.db
+      .query("substitutes")
+      .withIndex("by_incident", (q) => q.eq("incidentId", incidentId))
+      .collect();
+
+    if (subShift) {
+      // 당번: 특정 슬롯만 삭제
+      const target = subs.find((s) => s.subShift === subShift);
+      if (target) await ctx.db.delete(target._id);
+    } else {
+      // 단일: 전체 삭제
+      await Promise.all(subs.map((s) => ctx.db.delete(s._id)));
+    }
+
+    // 알림
+    const incident = await ctx.db.get(incidentId);
+    const incidentUser = incident ? await ctx.db.get(incident.userId) : null;
+    const shiftText = subShift ? `(${subShift})` : "";
+    const message = `[${incident?.date}] ${incidentUser?.name} 대체근무자${shiftText} 취소`;
+    await sendNotification(ctx, incident, message);
+  },
+});

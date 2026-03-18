@@ -184,6 +184,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
   const daySub = inc.substitutes?.find((s) => s.subShift === "주간");
   const nightSub = inc.substitutes?.find((s) => s.subShift === "야간");
   const singleSub = !isDuty && inc.substitutes?.[0];
+  const removeSubstitute = useMutation(api.substitutes.removeSubstitute);
 
   return (
     <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -213,8 +214,10 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
           // 당번: 주간/야간 각각 표시
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col gap-1.5 flex-1">
-              <SubRow label="🌞 주간" sub={daySub} missing={!daySub} />
-              <SubRow label="🌙 야간" sub={nightSub} missing={!nightSub} />
+              <SubRow label="주간" sub={daySub} missing={!daySub}
+                onRemove={daySub ? () => removeSubstitute({ incidentId: inc._id, subShift: "주간" }) : undefined} />
+              <SubRow label="야간" sub={nightSub} missing={!nightSub}
+                onRemove={nightSub ? () => removeSubstitute({ incidentId: inc._id, subShift: "야간" }) : undefined} />
             </div>
             {isPartialOrMissing && (
               <button onClick={onAddSub}
@@ -231,6 +234,10 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
             <RankBadge rank={singleSub.user?.rank} size="sm" />
             <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
             <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
+            <button onClick={() => removeSubstitute({ incidentId: inc._id })}
+              className="ml-auto text-gray-300 hover:text-red-400 transition-colors p-0.5">
+              <Trash2 size={13} />
+            </button>
           </div>
         ) : (
           // 미정
@@ -248,15 +255,21 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
   );
 }
 
-function SubRow({ label, sub, missing }) {
+function SubRow({ label, sub, missing, onRemove }) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs text-gray-500 w-14">{label}</span>
       {sub ? (
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 flex-1">
           <RankBadge rank={sub.user?.rank} size="sm" />
           <span className="text-sm font-semibold text-gray-900">{sub.user?.name}</span>
           <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
+          {onRemove && (
+            <button onClick={onRemove}
+              className="ml-auto text-gray-300 hover:text-red-400 transition-colors p-0.5">
+              <Trash2 size={13} />
+            </button>
+          )}
         </div>
       ) : (
         <span className="text-xs text-orange-400 font-bold bg-orange-50 px-3 py-0.5 rounded-full">대체자 미정</span>
