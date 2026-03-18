@@ -5,7 +5,7 @@ import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../context/AuthContext";
 import RankBadge from "../components/RankBadge";
-import { SHIFT_TYPES, ABSENCE_REASONS, DUTY_ROLES, toDateString } from "../utils/constants";
+import { SHIFT_TYPES, ABSENCE_REASONS, DUTY_ROLES, toDateString, formatDateKo } from "../utils/constants";
 
 export default function IncidentRegister() {
   const navigate = useNavigate();
@@ -118,8 +118,12 @@ export default function IncidentRegister() {
         </div>
         <div className="bg-gray-50 rounded-2xl p-5 w-full flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-gray-500">날짜 · 구분</span>
-            <span className="text-sm font-semibold text-gray-900">{form.date} ({form.shift})</span>
+            <span className="text-xs font-medium text-gray-500">날짜</span>
+            <span className="text-sm font-semibold text-gray-900">{formatDateKo(form.date)}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-gray-500">근무 구분</span>
+            <span className="text-sm font-semibold text-gray-900">{form.shift}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-gray-500">사유</span>

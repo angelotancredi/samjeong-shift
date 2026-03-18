@@ -39,6 +39,9 @@ export function getDutyTeam(date, cycleBase) {
   if (!cycleBase?.baseDate) return null;
   const base = parseDate(cycleBase.baseDate);
   const target = parseDate(date);
+  // 시간을 00:00:00으로 맞춰서 일수 차이 계산
+  base.setHours(0, 0, 0, 0);
+  target.setHours(0, 0, 0, 0);
   const diffDays = Math.round((target - base) / (1000 * 60 * 60 * 24));
   const mod = ((diffDays % 3) + 3) % 3;
   const teamIndex = (cycleBase.baseTeam - 1 + mod) % 3;
@@ -51,16 +54,15 @@ export function formatDate(date) {
 }
 
 export function formatDateKo(date) {
-  // "YYYY-MM-DD" 문자열은 UTC로 파싱되어 시간대 문제 발생 → 직접 파싱
-  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    const [y, m, d] = date.split("-").map(Number);
-    const days = ["일", "월", "화", "수", "목", "금", "토"];
-    const dow = new Date(y, m - 1, d).getDay();
-    return `${m}월 ${d}일 (${days[dow]})`;
-  }
-  const d = new Date(date);
+  if (!date) return "";
+  const d = parseDate(date);
+  if (isNaN(d.getTime())) return String(date);
+  
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
   const days = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+  const dow = d.getDay();
+  return `${m}월 ${day}일 (${days[dow]})`;
 }
 
 export function toDateString(date) {

@@ -151,8 +151,9 @@ export default function Home() {
             <span className="text-xs text-gray-600">{formatDateKo(today)}</span>
           </div>
           {(() => {
-            const todayInc = incidents.filter((i) => i.date === todayStr);
-            const dutyTeam = cycleBase ? getDutyTeam(today, cycleBase) : null;
+             const todayInc = incidents.filter((i) => i.date === todayStr);
+             const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+             const dutyTeam = cycleBase ? getDutyTeam(normalizedToday, cycleBase) : null;
             const tc = dutyTeam ? TEAM_COLORS[dutyTeam] : null;
             return (
               <div>
