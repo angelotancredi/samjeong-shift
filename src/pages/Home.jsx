@@ -292,7 +292,7 @@ function SubstituteDisplay({ inc, onAddSub }) {
                 <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
               </div>
             ) : (
-              <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-medium">미정</span>
+              <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
             )}
           </div>
         ))}
