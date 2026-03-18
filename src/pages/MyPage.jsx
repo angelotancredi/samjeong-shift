@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { LogOut, TrendingUp, Calendar, Users } from "lucide-react";
+import { User, LogOut, ChevronRight, List, Calendar, Bell, RefreshCw } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../context/AuthContext";
 import RankBadge from "../components/RankBadge";
 import BottomNav from "../components/BottomNav";
-import NotificationBell from "../components/NotificationBell";
 import { formatDateKo } from "../utils/constants";
 import { useState } from "react";
 
@@ -42,16 +41,21 @@ export default function MyPage() {
         {/* 1단: 상단 정보 영역 (표준) */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-            <p className="text-sm text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
-          </div>
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+              <p className="text-sm text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
+            </div>
             {profile && (
-              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100 shadow-sm">
-                <span className="text-xs text-blue-600 font-bold">{profile.rank}</span>
-                <span className="text-xs text-gray-900 font-bold">{profile.name}</span>
+              <div className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
               </div>
             )}
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={() => window.location.reload()} className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+              <RefreshCw size={18} />
+            </button>
             <NotificationBell />
           </div>
         </div>

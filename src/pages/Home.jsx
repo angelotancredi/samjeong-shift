@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Plus, UserPlus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, RefreshCw, UserPlus } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../context/AuthContext";
@@ -22,8 +22,7 @@ export default function Home() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [touchStart, setTouchStart] = useState(null);
-  const [addSubIncident, setAddSubIncident] = useState(null); // 추가: 오늘 현황에서도 사용하도록 이동
+  const [addSubIncident, setAddSubIncident] = useState(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -36,6 +35,8 @@ export default function Home() {
 
   const today = new Date();
   const todayStr = toDateString(today);
+  // 오늘 현황 전용 쿼리 (달력 이동과 독립적으로 항상 오늘 데이터 유지)
+  const todayIncidents = useQuery(api.incidents.listByMonth, { startDate: todayStr, endDate: todayStr }) ?? [];
 
   const getDaysInMonth = () => {
     const firstDay = new Date(year, month, 1).getDay();
@@ -57,45 +58,30 @@ export default function Home() {
     setShowModal(true);
   };
 
-  const handleTouchStart = (e) => {
-    setTouchStart(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = (e) => {
-    if (touchStart === null) return;
-    const touchEnd = e.changedTouches[0].clientX;
-    const diff = touchStart - touchEnd;
-    const threshold = 50; // 최소 스와이프 거리
-
-    if (diff > threshold) {
-      // 왼쪽으로 스와이프 -> 다음 달
-      setCurrentDate(new Date(year, month + 1, 1));
-    } else if (diff < -threshold) {
-      // 오른쪽으로 스와이프 -> 이전 달
-      setCurrentDate(new Date(year, month - 1, 1));
-    }
-    setTouchStart(null);
-  };
-
   const days = getDaysInMonth();
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
       <div className="bg-white px-5 pt-6 pb-4 sticky top-0 z-30 shadow-sm">
-        {/* 상단 정보 영역 */}
+        {/* 상단 정보 영역 (개편된 레이아웃) */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
-            <p className="text-sm text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
-          </div>
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-blue-600 rounded-full" />
+              <p className="text-sm text-gray-900 font-bold tracking-tight">삼정119안전센터</p>
+            </div>
             {profile && (
-              <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100 shadow-sm">
-                <span className="text-xs text-blue-600 font-bold">{profile.rank}</span>
-                <span className="text-xs text-gray-900 font-bold">{profile.name}</span>
+              <div className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
               </div>
             )}
+          </div>
+          <div className="flex items-center gap-1">
+            <button onClick={() => window.location.reload()} className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+              <RefreshCw size={18} />
+            </button>
             <NotificationBell />
           </div>
         </div>
@@ -121,7 +107,7 @@ export default function Home() {
       </div>
 
       {/* Calendar */}
-      <div className="bg-white px-3" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <div className="bg-white px-3">
         <div className="grid grid-cols-7">
           {days.map((day, idx) => {
             const dateObj = day ? new Date(year, month, day) : null;
@@ -167,9 +153,8 @@ export default function Home() {
             <span className="text-xs text-gray-600">{formatDateKo(today)}</span>
           </div>
           {(() => {
-             const todayInc = incidents.filter((i) => i.date === todayStr);
-             const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-             const dutyTeam = cycleBase ? getDutyTeam(normalizedToday, cycleBase) : null;
+              const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+              const dutyTeam = cycleBase ? getDutyTeam(normalizedToday, cycleBase) : null;
             const tc = dutyTeam ? TEAM_COLORS[dutyTeam] : null;
             return (
               <div>
@@ -179,11 +164,11 @@ export default function Home() {
                     <span className={`text-xs font-bold ${tc.text}`}>{dutyTeam}팀 당번</span>
                   </div>
                 )}
-                {todayInc.length === 0 ? (
+                {todayIncidents.length === 0 ? (
                   <p className="text-sm text-gray-600">오늘 등록된 사고자가 없습니다</p>
                 ) : (
                   <div className="flex flex-col gap-2">
-                    {todayInc.map((inc) => (
+                    {todayIncidents.map((inc) => (
                       <div key={inc._id} className="bg-gray-50 rounded-xl p-3">
                         <div className="flex items-center gap-2 mb-2">
                           <RankBadge rank={inc.user?.rank} size="sm" />
