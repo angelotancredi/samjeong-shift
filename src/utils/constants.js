@@ -45,6 +45,13 @@ export function formatDate(date) {
 }
 
 export function formatDateKo(date) {
+  // "YYYY-MM-DD" 문자열은 UTC로 파싱되어 시간대 문제 발생 → 직접 파싱
+  if (typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [y, m, d] = date.split("-").map(Number);
+    const days = ["일", "월", "화", "수", "목", "금", "토"];
+    const dow = new Date(y, m - 1, d).getDay();
+    return `${m}월 ${d}일 (${days[dow]})`;
+  }
   const d = new Date(date);
   const days = ["일", "월", "화", "수", "목", "금", "토"];
   return `${d.getMonth() + 1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
