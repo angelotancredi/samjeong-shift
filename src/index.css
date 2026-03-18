@@ -17,6 +17,7 @@ html, body, #root {
   background-color: #f8fafc;
   color: #111827;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
 .safe-bottom {

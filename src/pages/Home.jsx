@@ -74,12 +74,12 @@ export default function Home() {
              {profile && (
                <div className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
                  <span className="text-[12px] text-blue-600 font-bold">{profile.rank}</span>
-                 <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+                 <span className="text-[12px] text-gray-900 font-bold">{profile.name}</span>
                </div>
              )}
           </div>
           <div className="flex items-center gap-1">
-            <button onClick={() => window.location.reload()} className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+            <button onClick={() => window.location.reload()} className="p-2 text-blue-600 hover:text-blue-500 transition-colors">
               <RefreshCw size={18} />
             </button>
             <NotificationBell />
@@ -120,7 +120,7 @@ export default function Home() {
             const tc = dutyTeam ? TEAM_COLORS[dutyTeam] : null;
             return (
               <div key={idx} onClick={() => handleDayClick(day)}
-                className={`min-h-[64px] p-1 border-b border-gray-50 ${day ? "cursor-pointer active:bg-blue-50" : ""}`}>
+                className={`h-[75px] p-1 border-b border-gray-50 overflow-hidden ${day ? "cursor-pointer active:bg-blue-50" : ""}`}>
                 {day && (
                   <>
                     <div className="flex flex-col items-center gap-0.5">

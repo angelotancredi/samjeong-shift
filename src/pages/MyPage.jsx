@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { User, LogOut, ChevronRight, List, Calendar, Bell, RefreshCw } from "lucide-react";
+import { User, LogOut, ChevronRight, List, Calendar, Bell, RefreshCw, Users, TrendingUp } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../context/AuthContext";
 import RankBadge from "../components/RankBadge";
 import BottomNav from "../components/BottomNav";
+import NotificationBell from "../components/NotificationBell";
 import { formatDateKo } from "../utils/constants";
 import { useState } from "react";
 
@@ -15,7 +16,7 @@ const REASON_COLORS = {
 };
 
 export default function MyPage() {
-  const { profile, logout } = useAuth();
+  const { profile } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState("incidents");
 
@@ -33,8 +34,6 @@ export default function MyPage() {
     (s) => new Date(s._creationTime).getFullYear() === thisYear
   ).length;
 
-  const handleLogout = () => { logout(); navigate("/login"); };
-
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <div className="bg-white px-5 pt-6 pb-4 sticky top-0 z-30 shadow-sm">
@@ -47,8 +46,8 @@ export default function MyPage() {
             </div>
             {profile && (
               <div className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
-                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+                <span className="text-[12px] text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-[12px] text-gray-900 font-bold">{profile.name}</span>
               </div>
             )}
           </div>
@@ -143,6 +142,7 @@ export default function MyPage() {
           ))
         )}
       </div>
+
       <BottomNav />
     </div>
   );

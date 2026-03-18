@@ -60,8 +60,8 @@ export default function History() {
             </div>
             {profile && (
               <div className="flex items-center gap-1 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
-                <span className="text-[10px] text-blue-600 font-bold">{profile.rank}</span>
-                <span className="text-[10px] text-gray-900 font-bold">{profile.name}</span>
+                <span className="text-[12px] text-blue-600 font-bold">{profile.rank}</span>
+                <span className="text-[12px] text-gray-900 font-bold">{profile.name}</span>
               </div>
             )}
           </div>
