@@ -204,7 +204,7 @@ export default function Home() {
 
       {/* FAB */}
       <button onClick={() => navigate("/incident-register")}
-        className="fixed right-5 bottom-24 w-14 h-14 bg-blue-600 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-30">
+        className="fixed right-5 bottom-[84px] w-14 h-14 bg-blue-600 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-30">
         <Plus size={26} className="text-white" strokeWidth={2.5} />
       </button>
 
