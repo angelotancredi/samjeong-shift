@@ -40,7 +40,7 @@ export default function IncidentRegister() {
     if (profile) {
       setForm((f) => ({
         ...f,
-        incident_user_id: profile._id,
+        incident_user_id: profile?._id,
         incident_user: profile,
       }));
     }
@@ -48,6 +48,13 @@ export default function IncidentRegister() {
 
   const allUsers = useQuery(api.users.listUsers) ?? [];
   const createIncident = useMutation(api.incidents.create);
+
+  // profile 로딩 중이면 스피너 표시
+  if (!profile) return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
 
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -68,13 +75,13 @@ export default function IncidentRegister() {
     setLoading(true);
     try {
       await createIncident({
-        userId: profile._id,
+        userId: profile?._id,
         date: form.date,
         shift: form.shift,
         reason: form.reason,
         duty: form.duty || undefined,
         note: form.note || undefined,
-        registeredBy: profile._id,
+        registeredBy: profile?._id,
         // 당번이면 주간/야간 각각, 아니면 단일
         substituteUserId: isDuty
           ? (form.sub_day_id || undefined)
@@ -95,7 +102,7 @@ export default function IncidentRegister() {
     setSuccess(false);
     setStep(1);
     setForm({
-      incident_user_id: profile._id,
+      incident_user_id: profile?._id,
       incident_user: profile,
       date: initialDate,
       shift: "", reason: "", duty: "", note: "",
@@ -185,8 +192,8 @@ export default function IncidentRegister() {
           <div className="flex items-center gap-2">
             {profile && (
               <div className="flex items-center gap-1.5 bg-gray-50 px-2.5 py-1 rounded-full border border-gray-100 shadow-sm">
-                <span className="text-xs text-blue-600 font-bold">{profile.rank}</span>
-                <span className="text-xs text-gray-900 font-bold">{profile.name}</span>
+                <span className="text-xs text-blue-600 font-bold">{profile?.rank}</span>
+                <span className="text-xs text-gray-900 font-bold">{profile?.name}</span>
               </div>
             )}
             <NotificationBell size={18} />
