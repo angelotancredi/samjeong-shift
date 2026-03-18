@@ -4,22 +4,23 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import RankBadge from "./RankBadge";
 
-// incident: { _id, shift, userId }
-// users: 전체 직원 목록
 export default function AddSubstituteModal({ incident, users, onClose, onDone }) {
   const isDuty = incident?.shift === "당번";
   const addSubstitute = useMutation(api.substitutes.addSubstitute);
   const addSubstituteDuty = useMutation(api.substitutes.addSubstituteDuty);
 
-  // 단일 (주간/야간)
-  const [selectedId, setSelectedId] = useState(null);
+  // 기존 대체자 정보 초기값으로 설정
+  const existingDay = incident?.substitutes?.find((s) => s.subShift === "주간");
+  const existingNight = incident?.substitutes?.find((s) => s.subShift === "야간");
+  const existingSingle = !isDuty && incident?.substitutes?.[0];
 
-  // 당번 전용
+  const [selectedId, setSelectedId] = useState(existingSingle?.substituteUserId ?? null);
+
   const [activeSlot, setActiveSlot] = useState("day");
-  const [dayId, setDayId] = useState(null);
-  const [dayUser, setDayUser] = useState(null);
-  const [nightId, setNightId] = useState(null);
-  const [nightUser, setNightUser] = useState(null);
+  const [dayId, setDayId] = useState(existingDay?.substituteUserId ?? null);
+  const [dayUser, setDayUser] = useState(existingDay?.user ?? null);
+  const [nightId, setNightId] = useState(existingNight?.substituteUserId ?? null);
+  const [nightUser, setNightUser] = useState(existingNight?.user ?? null);
 
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -70,6 +71,11 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
     }
   };
 
+  // 단일 대체자 기존 유저 찾기
+  const selectedUser = !isDuty && selectedId
+    ? users.find((u) => u._id === selectedId)
+    : null;
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
@@ -84,7 +90,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
           </p>
         </div>
 
-        {/* 당번: 주간/야간 슬롯 선택 */}
+        {/* 당번: 주간/야간 슬롯 */}
         {isDuty && (
           <div className="px-5 pt-3 grid grid-cols-2 gap-2">
             <button
@@ -93,14 +99,14 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                 activeSlot === "day" ? "border-blue-500 bg-blue-50" : "border-gray-100 bg-gray-50"
               }`}
             >
-              <p className={`text-xs font-bold mb-1 ${activeSlot === "day" ? "text-blue-500" : "text-gray-400"}`}>🌞 주간</p>
+              <p className={`text-xs font-bold mb-1 ${activeSlot === "day" ? "text-blue-500" : "text-gray-400"}`}>주간</p>
               {dayUser ? (
                 <div className="flex items-center gap-1.5">
                   <RankBadge rank={dayUser.rank} size="sm" />
                   <span className="text-xs font-bold text-black truncate">{dayUser.name}</span>
                 </div>
               ) : (
-                <p className="text-xs font-bold text-orange-400">대체자 미정</p>
+                <p className="text-xs font-bold text-orange-400">미정</p>
               )}
             </button>
             <button
@@ -109,14 +115,14 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                 activeSlot === "night" ? "border-violet-500 bg-violet-50" : "border-gray-100 bg-gray-50"
               }`}
             >
-              <p className={`text-xs font-bold mb-1 ${activeSlot === "night" ? "text-violet-500" : "text-gray-400"}`}>🌙 야간</p>
+              <p className={`text-xs font-bold mb-1 ${activeSlot === "night" ? "text-violet-500" : "text-gray-400"}`}>야간</p>
               {nightUser ? (
                 <div className="flex items-center gap-1.5">
                   <RankBadge rank={nightUser.rank} size="sm" />
                   <span className="text-xs font-bold text-black truncate">{nightUser.name}</span>
                 </div>
               ) : (
-                <p className="text-xs font-bold text-orange-400">대체자 미정</p>
+                <p className="text-xs font-bold text-orange-400">미정</p>
               )}
             </button>
           </div>
@@ -165,7 +171,6 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                     <span className="font-medium text-black text-sm">{u.name}</span>
                     <span className="text-xs text-gray-500 ml-1.5">{u.team}팀 · {u.rank}</span>
                   </div>
-                  {/* 이미 다른 슬롯에 지정된 경우 뱃지 */}
                   {isDuty && isDay && activeSlot === "night" && (
                     <span className="text-[10px] bg-blue-100 text-blue-600 font-bold px-1.5 py-0.5 rounded-full">주간</span>
                   )}
