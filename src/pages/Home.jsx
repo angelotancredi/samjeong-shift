@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Plus, RefreshCw, UserPlus } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
@@ -247,20 +247,51 @@ export default function Home() {
 }
 
 function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAddSubIncident }) {
-
   const dutyTeam = cycleBase ? getDutyTeam(date, cycleBase) : null;
   const tc = dutyTeam ? { 1:{text:"text-blue-700"}, 2:{text:"text-emerald-700"}, 3:{text:"text-violet-700"} }[dutyTeam] : null;
+
+  const [dragY, setDragY] = useState(0);
+  const touchStartY = useRef(null);
+
+  // 뒤로가기 버튼 처리
+  useEffect(() => {
+    const handlePopState = (e) => {
+      e.preventDefault();
+      onClose();
+      window.history.pushState(null, "", window.location.href);
+    };
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [onClose]);
+
+  const onTouchStart = (e) => {
+    touchStartY.current = e.touches[0].clientY;
+  };
+  const onTouchMove = (e) => {
+    const diff = e.touches[0].clientY - touchStartY.current;
+    if (diff > 0) setDragY(diff);
+  };
+  const onTouchEnd = () => {
+    if (dragY > 100) {
+      onClose();
+    } else {
+      setDragY(0);
+    }
+    touchStartY.current = null;
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       <div className="absolute inset-0 bg-black/40 animate-fade-in" onClick={onClose} />
-      <div 
-        className="relative mt-auto bg-white rounded-t-[32px] h-[80vh] flex flex-col transition-transform duration-200 ease-out shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
-        
+      <div
+        className="relative mt-auto bg-white rounded-t-[32px] h-[80vh] flex flex-col shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
+        style={{ transform: `translateY(${dragY}px)`, transition: dragY === 0 ? "transform 0.2s ease-out" : "none" }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
-        <div 
-          className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing"
-        >
+        <div className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing">
           <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
         </div>
         <div className="px-5 py-4 border-b border-gray-100">
