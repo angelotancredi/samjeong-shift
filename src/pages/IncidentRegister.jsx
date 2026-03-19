@@ -39,6 +39,7 @@ export default function IncidentRegister() {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     if (profile) {
@@ -61,6 +62,7 @@ export default function IncidentRegister() {
   );
 
   const update = (k, v) => {
+    setError(""); // Clear error on change
     const newForm = { ...form, [k]: v };
     // reason이 "지각" 또는 "조퇴"이면 shift 초기화
     if (k === "reason" && (v === "지각" || v === "조퇴")) {
@@ -81,11 +83,15 @@ export default function IncidentRegister() {
   const handleSubmit = async () => {
     const isLateLateLeave = form.reason === "지각" || form.reason === "조퇴";
     if (!form.date || !form.reason) {
-      alert("날짜와 사유를 모두 입력해주세요.");
+      setError("날짜와 사유를 모두 입력해주세요.");
+      return;
+    }
+    if (!form.duty) {
+      setError("담당 업무를 선택해주세요.");
       return;
     }
     if (!isLateLateLeave && !form.shift) {
-      alert("근무 구분을 선택해주세요.");
+      setError("근무 구분을 선택해주세요.");
       return;
     }
     // 지각/조퇴 시 시간 입력 필수 및 검증
@@ -283,20 +289,31 @@ export default function IncidentRegister() {
 
       {/* 하단 버튼 */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 pt-4 pb-10 safe-bottom">
+         {error && (
+           <div className="flex items-center gap-1.5 justify-center mb-3 animate-pulse">
+             <AlertCircle size={14} className="text-red-500" />
+             <span className="text-xs font-bold text-red-500">{error}</span>
+           </div>
+         )}
          {step === 1 ? (
            <button
              onClick={() => {
                const isLateLateLeave = form.reason === "지각" || form.reason === "조퇴";
                if (!form.date || !form.reason) {
-                 alert("날짜와 사유를 모두 입력해주세요.");
+                 setError("날짜와 사유를 모두 선택해주세요.");
+                 return;
+               }
+               if (!form.duty) {
+                 setError("담당 업무를 선택해주세요.");
                  return;
                }
                if (!isLateLateLeave && !form.shift) {
-                 alert("근무 구분을 선택해주세요.");
+                 setError("근무 구분을 선택해주세요.");
                  return;
                }
                // 지각/조퇴도 항상 대기근무자 지정 단계로 이동
                setSearchQuery("");
+               setError("");
                setStep(2);
              }}
              className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-base"
@@ -705,7 +722,6 @@ function DutySelector({ value, onChange }) {
       <div className="bg-white rounded-2xl p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-black">담당 업무</h3>
-          <span className="text-xs text-gray-400 font-normal">(선택)</span>
         </div>
         <button
           type="button"
