@@ -118,3 +118,12 @@ export const deleteUser = mutation({
     await ctx.db.delete(id);
   },
 });
+// 팀 내 순서 일괄 저장
+export const updateSortOrder = mutation({
+  args: { updates: v.array(v.object({ id: v.id("users"), sortOrder: v.number() })) },
+  handler: async (ctx, { updates }) => {
+    await Promise.all(
+      updates.map(({ id, sortOrder }) => ctx.db.patch(id, { sortOrder }))
+    );
+  },
+});

@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Home, List, User, Settings, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const navItems = [
   { path: "/", icon: Home, label: "홈" },
@@ -25,11 +25,14 @@ export default function BottomNav() {
     navigate("/login");
   };
 
-  // 로그아웃 모달 뒤로가기 연동
+  const closeLogoutRef = useRef(() => setShowLogoutModal(false));
+  closeLogoutRef.current = () => setShowLogoutModal(false);
+
+  // 로그아웃 모달 뒤로가기 연동 (안정화)
   useEffect(() => {
     if (!showLogoutModal) return;
     window.history.pushState({ modal: "logout" }, "");
-    const handlePopState = () => setShowLogoutModal(false);
+    const handlePopState = () => closeLogoutRef.current?.();
     window.addEventListener("popstate", handlePopState);
     return () => {
       window.removeEventListener("popstate", handlePopState);

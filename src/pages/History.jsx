@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Filter, Trash2, UserPlus, List, Search, RefreshCw } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -34,6 +34,9 @@ export default function History() {
   const allIncidents = useQuery(api.incidents.listByMonth, { startDate, endDate }) ?? [];
   const allUsers = useQuery(api.users.listUsers) ?? [];
   const removeIncident = useMutation(api.incidents.remove);
+
+  const handleCloseAddSub = useCallback(() => setAddSubIncident(null), []);
+  const handleDoneAddSub = useCallback(() => setAddSubIncident(null), []);
 
   // 당번 미정 판단
   const isPartialOrMissing = (inc) => {
@@ -185,8 +188,8 @@ export default function History() {
         <AddSubstituteModal
           incident={addSubIncident}
           users={allUsers}
-          onClose={() => setAddSubIncident(null)}
-          onDone={() => setAddSubIncident(null)}
+          onClose={handleCloseAddSub}
+          onDone={handleDoneAddSub}
         />
       )}
 

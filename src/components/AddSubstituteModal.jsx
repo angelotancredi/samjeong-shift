@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Check } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -35,33 +35,6 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
   const [nightUser, setNightUser] = useState(existingNight?.user ?? null);
 
   const [loading, setLoading] = useState(false);
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchOffset, setTouchOffset] = useState(0);
-
-  // 뒤로가기 버튼 연동
-  useEffect(() => {
-    window.history.pushState({ modal: "addSub" }, "");
-    const handlePopState = () => onClose();
-    window.addEventListener("popstate", handlePopState);
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-      if (window.history.state?.modal === "addSub") {
-        window.history.back();
-      }
-    };
-  }, [onClose]);
-
-  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientY);
-  const handleTouchMove = (e) => {
-    if (touchStart === null) return;
-    const currentY = e.targetTouches[0].clientY;
-    const offset = currentY - touchStart;
-    if (offset > 0) setTouchOffset(offset);
-  };
-  const handleTouchEnd = () => {
-    if (touchOffset > 100) onClose();
-    else { setTouchStart(null); setTouchOffset(0); }
-  };
 
   const handleSelectDuty = (u) => {
     if (activeSlot === "day") {
@@ -104,19 +77,9 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
-      <div className="absolute inset-0 bg-black/30 animate-fade-in" onClick={onClose} />
-      <div 
-        className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col transition-transform duration-200 ease-out"
-        style={{ 
-          transform: `translateY(${touchOffset}px)`,
-        }}
-      >
-        <div 
-          className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
+      <div className="absolute inset-0 bg-black/30" onClick={(e) => { e.stopPropagation(); onClose(); }} />
+      <div className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col">
+        <div className="w-full pt-3 pb-2">
           <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
         </div>
 

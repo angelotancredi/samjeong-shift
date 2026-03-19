@@ -8,6 +8,7 @@ export default defineSchema({
     rank: v.string(),
     team: v.number(),
     isAdmin: v.boolean(),
+    sortOrder: v.optional(v.number()),
   }).index("by_name", ["name"]),
 
   dutyCycle: defineTable({

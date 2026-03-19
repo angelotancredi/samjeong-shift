@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Plus, RefreshCw, UserPlus } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
@@ -21,8 +21,11 @@ export default function Home() {
   const { profile } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [addSubIncident, setAddSubIncident] = useState(null);
+
+  const handleCloseDayModal = useCallback(() => setSelectedDate(null), []);
+  const handleCloseAddModal = useCallback(() => setAddSubIncident(null), []);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -55,7 +58,7 @@ export default function Home() {
   const handleDayClick = (day) => {
     if (!day) return;
     setSelectedDate(new Date(year, month, day));
-    setShowModal(true);
+    setShowAddModal(true);
   };
 
   const days = getDaysInMonth();
@@ -202,59 +205,32 @@ export default function Home() {
        </button>
 
       {/* Day modal */}
-      {showModal && selectedDate && (
-        <DayModal
-          date={selectedDate}
-          incidents={incidents.filter((i) => i.date === toDateString(selectedDate))}
-          allUsers={allUsers}
-          cycleBase={cycleBase}
-          onClose={() => setShowModal(false)}
-          onAdd={() => { setShowModal(false); navigate("/incident-register", { state: { date: toDateString(selectedDate) } }); }}
-          setAddSubIncident={setAddSubIncident}
-        />
-      )}
-      {addSubIncident && (
-        <AddSubstituteModal
-          incident={addSubIncident}
-          users={allUsers}
-          onClose={() => setAddSubIncident(null)}
-          onDone={() => setAddSubIncident(null)}
-        />
-      )}
+      {selectedDate && (
+          <DayModal
+            date={selectedDate}
+            incidents={incidents.filter((i) => i.date === toDateString(selectedDate))}
+            allUsers={allUsers}
+            cycleBase={cycleBase}
+            onClose={handleCloseDayModal}
+            onAdd={() => { setSelectedDate(null); navigate("/incident-register", { state: { date: toDateString(selectedDate) } }); }}
+            setAddSubIncident={setAddSubIncident}
+          />
+        )}
+
+        {addSubIncident && (
+          <AddSubstituteModal
+            incident={addSubIncident}
+            users={allUsers}
+            onClose={handleCloseAddModal}
+            onDone={handleCloseAddModal}
+          />
+        )}
       <BottomNav />
     </div>
   );
 }
 
 function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAddSubIncident }) {
-  const { profile } = useAuth(); // 인증 정보 필요 (뒤로가기 상태 체크용)
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchOffset, setTouchOffset] = useState(0);
-
-  // 뒤로가기 버튼 연동
-  useEffect(() => {
-    window.history.pushState({ modal: "dayModal" }, "");
-    const handlePopState = () => onClose();
-    window.addEventListener("popstate", handlePopState);
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-      if (window.history.state?.modal === "dayModal") {
-        window.history.back();
-      }
-    };
-  }, [onClose]);
-
-  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientY);
-  const handleTouchMove = (e) => {
-    if (touchStart === null) return;
-    const currentY = e.targetTouches[0].clientY;
-    const offset = currentY - touchStart;
-    if (offset > 0) setTouchOffset(offset);
-  };
-  const handleTouchEnd = () => {
-    if (touchOffset > 100) onClose();
-    else { setTouchStart(null); setTouchOffset(0); }
-  };
 
   const dutyTeam = cycleBase ? getDutyTeam(date, cycleBase) : null;
   const tc = dutyTeam ? { 1:{text:"text-blue-700"}, 2:{text:"text-emerald-700"}, 3:{text:"text-violet-700"} }[dutyTeam] : null;
@@ -264,13 +240,10 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
       <div className="absolute inset-0 bg-black/40 animate-fade-in" onClick={onClose} />
       <div 
         className="relative mt-auto bg-white rounded-t-[32px] h-[80vh] flex flex-col transition-transform duration-200 ease-out shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
-        style={{ transform: `translateY(${touchOffset}px)` }}
+        
       >
         <div 
           className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
         >
           <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
         </div>
@@ -281,7 +254,7 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
               {dutyTeam && <span className={`text-xs font-bold ${tc.text}`}>{dutyTeam}팀 당번</span>}
             </div>
             <button onClick={onAdd} className="flex items-center gap-1 bg-blue-600 text-white text-sm font-medium px-3 py-2 rounded-xl active:scale-95 transition-transform">
-              <Plus size={14} />대체자 등록
+              <Plus size={14} />사고자 등록
             </button>
           </div>
         </div>
