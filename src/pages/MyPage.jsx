@@ -110,8 +110,13 @@ export default function MyPage() {
               <div className="flex items-center justify-between mb-1">
                 <p className="text-xs text-gray-600">{formatDateKo(inc.date + "T00:00:00")}</p>
                 <div className="flex gap-1.5">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${REASON_COLORS[inc.reason] || "bg-gray-100 text-gray-600"}`}>{inc.reason}</span>
-                  <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{inc.shift}</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${REASON_COLORS[inc.reason] || "bg-gray-100 text-gray-600"}`}>
+                    {inc.reason}
+                    {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime ? ` (${inc.startTime.split(":")[0]}~${inc.endTime.split(":")[0]})` : ""}
+                  </span>
+                  {inc.shift && (
+                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{inc.shift}</span>
+                  )}
                 </div>
               </div>
               {inc.substitutes?.length > 0 ? (
@@ -135,7 +140,11 @@ export default function MyPage() {
                 <RankBadge rank={sub.incidentUser?.rank} size="sm" />
                 <div>
                   <span className="text-sm font-medium text-gray-800">{sub.incidentUser?.name}</span>
-                  <span className="text-xs text-gray-600 ml-1">({sub.reason} · {sub.shift})</span>
+                  <span className="text-xs text-gray-600 ml-1">
+                    ({sub.reason}
+                    {(sub.reason === "지각" || sub.reason === "조퇴") && sub.startTime && sub.endTime ? ` ${sub.startTime.split(":")[0]}~${sub.endTime.split(":")[0]}` : ""}
+                    {sub.shift && sub.shift !== "지각/조퇴" ? ` · ${sub.shift}` : ""})
+                  </span>
                 </div>
               </div>
             </div>

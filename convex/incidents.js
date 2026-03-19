@@ -81,6 +81,8 @@ export const listSubstitutesByUser = query({
           date: incident?.date,
           shift: incident?.shift,
           reason: incident?.reason,
+          startTime: incident?.startTime,
+          endTime: incident?.endTime,
           incidentUser,
         };
       })
@@ -172,7 +174,16 @@ export const create = mutation({
     }
 
     const dutyText = args.duty ? ` [${args.duty}]` : "";
-    const message = `[${args.date}] ${incidentUser?.name} ${args.reason}(${args.shift})${dutyText}${subText}`;
+    
+    // 지각/조퇴 시 시간 정보 포맷팅 (09~11 형식)
+    let timeText = "";
+    if ((args.reason === "지각" || args.reason === "조퇴") && args.startTime && args.endTime) {
+      const startH = args.startTime.split(":")[0];
+      const endH = args.endTime.split(":")[0];
+      timeText = `(${startH}~${endH})`;
+    }
+
+    const message = `[${args.date}] ${incidentUser?.name} ${args.reason}${timeText}(${args.shift || "지각/조퇴"})${dutyText}${subText}`;
     const allUsers = await ctx.db.query("users").collect();
     await Promise.all(
       allUsers.map((u) =>

@@ -211,19 +211,12 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
           <div className="flex items-center gap-1 flex-wrap">
             <span className="font-bold text-black">{inc.user?.name}</span>
             <span className="text-xs text-gray-600">{inc.user?.team}팀</span>
-            {/* 사유 배지 - 지각/조퇴시 시간 정보 포함 */}
             <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${REASON_COLORS[inc.reason] || "bg-gray-100 text-gray-800"}`}>
               {inc.reason}
               {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && (
-                <span className="ml-1 text-orange-600">{(() => {
-                  const [startH, startM] = inc.startTime.split(':').map(Number);
-                  const [endH, endM] = inc.endTime.split(':').map(Number);
-                  const totalStart = startH * 60 + startM;
-                  const totalEnd = endH * 60 + endM;
-                  const diffMin = totalEnd - totalStart;
-                  const diffHours = Math.round(diffMin / 60 * 10) / 10;
-                  return `${diffHours}h / ${startH}~${endH}`;
-                })()}</span>
+                <span className="ml-1 text-orange-600">
+                  {inc.startTime.split(':')[0]}~{inc.endTime.split(':')[0]}
+                </span>
               )}
             </span>
             {inc.shift && <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">{inc.shift}</span>}
@@ -244,7 +237,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
         {inc.reason === "지각" || inc.reason === "조퇴" ? (
           // 지각/조퇴: 대체자 있으면 표시, 없으면 미정 + 등록 버튼
           <div className="flex items-center justify-between gap-4">
-            <div className="flex flex-col gap-1 flex-1">
+            <div className="flex flex-col gap-1.5 flex-1">
               {singleSub ? (
                 <div className="flex items-center gap-2">
                   <span className="w-6 shrink-0" />
@@ -252,7 +245,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
                   <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
                   <RankBadge rank={singleSub.user?.rank} size="sm" />
                   <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
-                  <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
+                  <span className="text-xs text-gray-500 shrink-0">{singleSub.user?.team}팀</span>
                   {(profile?.isAdmin || profile?._id === inc.registeredBy) && (
                     <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
                       className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
@@ -265,7 +258,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
                   <span className="w-6 shrink-0" />
                   <span className="w-7 shrink-0" />
                   <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
-                  <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">미정</span>
+                  <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">대체자 미정</span>
                 </div>
               )}
             </div>
@@ -300,10 +293,10 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
             <span className="w-6 shrink-0" />
             <span className="w-7 shrink-0" />
             <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
-            <div className="flex items-center gap-1.5 flex-1">
+            <div className="flex items-center gap-1.5 flex-1 min-w-0">
               <RankBadge rank={singleSub.user?.rank} size="sm" />
-              <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
-              <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
+              <span className="text-sm font-semibold text-gray-900 truncate">{singleSub.user?.name}</span>
+              <span className="text-xs text-gray-500 shrink-0">{singleSub.user?.team}팀</span>
                {(profile?.isAdmin || profile?._id === inc.registeredBy) && (
                 <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
                   className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
@@ -319,10 +312,10 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
               <span className="w-6 shrink-0" />
               <span className="w-7 shrink-0" />
               <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
-              <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-1 rounded-full">미정</span>
+              <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-1 rounded-full">대체자 미정</span>
             </div>
             <button onClick={onAddSub}
-              className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full">
+              className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full active:scale-95 transition-transform">
               <UserPlus size={12} />
               대체자 등록
             </button>
@@ -353,13 +346,13 @@ function SubRow({ label, sub, missing, onRemove }) {
   return (
     <div className="flex items-center gap-2">
       <span className="w-6 shrink-0" />
-      <span className="text-xs text-gray-500 w-7 shrink-0">{label}</span>
+      <span className="text-xs text-gray-500 w-7 shrink-0 text-right">{label || ""}</span>
       <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
       {sub ? (
-        <div className="flex items-center gap-1.5 flex-1">
+        <div className="flex items-center gap-1.5 flex-1 min-w-0">
           <RankBadge rank={sub.user?.rank} size="sm" />
-          <span className="text-sm font-semibold text-gray-900">{sub.user?.name}</span>
-          <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
+          <span className="text-sm font-semibold text-gray-900 truncate">{sub.user?.name}</span>
+          <span className="text-xs text-gray-500 shrink-0">{sub.user?.team}팀</span>
           {onRemove && (
             <button onClick={onRemove}
               className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
@@ -368,7 +361,7 @@ function SubRow({ label, sub, missing, onRemove }) {
           )}
         </div>
       ) : (
-        <span className="text-xs text-orange-400 font-bold bg-orange-50 px-2 py-0.5 rounded-full">미정</span>
+        <span className="text-xs text-orange-400 font-bold bg-orange-50 px-2 py-0.5 rounded-full">대체자 미정</span>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Plus, RefreshCw, UserPlus } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
@@ -176,13 +176,9 @@ export default function Home() {
                           <span className="text-xs text-gray-500">
                             ({inc.reason}
                             {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && (() => {
-                              const [startH, startM] = inc.startTime.split(':').map(Number);
-                              const [endH, endM] = inc.endTime.split(':').map(Number);
-                              const totalStart = startH * 60 + startM;
-                              const totalEnd = endH * 60 + endM;
-                              const diffMin = totalEnd - totalStart;
-                              const diffHours = Math.round(diffMin / 60 * 10) / 10;
-                              return ` ${diffHours}h / ${startH}~${endH}`;
+                              const startH = inc.startTime.split(':')[0];
+                              const endH = inc.endTime.split(':')[0];
+                              return ` ${startH}~${endH}`;
                             })()}
                             {inc.shift && ` · ${inc.shift}`})
                           </span>
@@ -231,14 +227,53 @@ export default function Home() {
 }
 
 function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAddSubIncident }) {
+  const { profile } = useAuth(); // 인증 정보 필요 (뒤로가기 상태 체크용)
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchOffset, setTouchOffset] = useState(0);
+
+  // 뒤로가기 버튼 연동
+  useEffect(() => {
+    window.history.pushState({ modal: "dayModal" }, "");
+    const handlePopState = () => onClose();
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      if (window.history.state?.modal === "dayModal") {
+        window.history.back();
+      }
+    };
+  }, [onClose]);
+
+  const handleTouchStart = (e) => setTouchStart(e.targetTouches[0].clientY);
+  const handleTouchMove = (e) => {
+    if (touchStart === null) return;
+    const currentY = e.targetTouches[0].clientY;
+    const offset = currentY - touchStart;
+    if (offset > 0) setTouchOffset(offset);
+  };
+  const handleTouchEnd = () => {
+    if (touchOffset > 100) onClose();
+    else { setTouchStart(null); setTouchOffset(0); }
+  };
+
   const dutyTeam = cycleBase ? getDutyTeam(date, cycleBase) : null;
   const tc = dutyTeam ? { 1:{text:"text-blue-700"}, 2:{text:"text-emerald-700"}, 3:{text:"text-violet-700"} }[dutyTeam] : null;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       <div className="absolute inset-0 bg-black/40 animate-fade-in" onClick={onClose} />
-      <div className="relative mt-auto bg-white rounded-t-[32px] h-[80vh] flex flex-col animate-slide-up shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
-        <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-3 mb-1" />
+      <div 
+        className="relative mt-auto bg-white rounded-t-[32px] h-[80vh] flex flex-col transition-transform duration-200 ease-out shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
+        style={{ transform: `translateY(${touchOffset}px)` }}
+      >
+        <div 
+          className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
+        </div>
         <div className="px-5 py-4 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <div>
@@ -246,7 +281,7 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
               {dutyTeam && <span className={`text-xs font-bold ${tc.text}`}>{dutyTeam}팀 당번</span>}
             </div>
             <button onClick={onAdd} className="flex items-center gap-1 bg-blue-600 text-white text-sm font-medium px-3 py-2 rounded-xl active:scale-95 transition-transform">
-              <Plus size={14} />등록
+              <Plus size={14} />대체자 등록
             </button>
           </div>
         </div>
@@ -268,15 +303,9 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
                         <span className="text-xs bg-red-100 text-red-600 font-medium px-2 py-1 rounded-full">
                           {inc.reason}
                           {(inc.reason === "지각" || inc.reason === "조퇴") && inc.startTime && inc.endTime && (
-                            <span className="ml-1">{(() => {
-                              const [startH, startM] = inc.startTime.split(':').map(Number);
-                              const [endH, endM] = inc.endTime.split(':').map(Number);
-                              const totalStart = startH * 60 + startM;
-                              const totalEnd = endH * 60 + endM;
-                              const diffMin = totalEnd - totalStart;
-                              const diffHours = Math.round(diffMin / 60 * 10) / 10;
-                              return `${diffHours}h / ${startH}~${endH}`;
-                            })()}</span>
+                            <span className="ml-1">
+                              {inc.startTime.split(':')[0]}~{inc.endTime.split(':')[0]}
+                            </span>
                           )}
                         </span>
                         {inc.shift && <span className="text-xs bg-gray-200 text-gray-600 font-medium px-2 py-1 rounded-full">{inc.shift}</span>}
@@ -308,26 +337,26 @@ function SubstituteDisplay({ inc, onAddSub }) {
   const singleSub = !isDuty && inc.substitutes?.[0];
   const hasAll = isDuty ? (daySub && nightSub) : singleSub;
 
-  // 단일 대체자 행 (라벨 없음 — 빈 w-7로 → 위치 맞춤)
-  const SingleRow = ({ sub, onAdd }) => (
+  // 단일 대체자 행 (이전의 자연스러운 들여쓰기 복구)
+  const SingleRow = ({ sub, onAdd, label }) => (
     <div className="flex items-center gap-2">
       <span className="w-6 shrink-0" />
-      <span className="w-7 shrink-0" />
+      <span className="text-xs text-gray-500 w-7 shrink-0 text-right">{label || ""}</span>
       <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
       {sub ? (
-        <>
+        <div className="flex items-center gap-1.5 flex-1 min-w-0">
           <RankBadge rank={sub.user?.rank} size="sm" />
-          <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
-          <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
-        </>
+          <span className="text-sm font-medium text-gray-900 truncate">{sub.user?.name}</span>
+          <span className="text-xs text-gray-500 shrink-0">{sub.user?.team}팀</span>
+        </div>
       ) : (
-        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">미정</span>
+        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">대체자 미정</span>
       )}
       {!sub && onAdd && (
         <button onClick={onAdd}
-          className="ml-auto flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95">
+          className="ml-auto flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
           <UserPlus size={12} />
-          등록
+          대체자 등록
         </button>
       )}
     </div>
@@ -338,62 +367,13 @@ function SubstituteDisplay({ inc, onAddSub }) {
     return <SingleRow sub={singleSub} onAdd={!singleSub ? onAddSub : null} />;
   }
 
-  // 당번: 주간/야간 각각
-  if (isDuty) {
-    return (
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex flex-col gap-1 flex-1">
-          {[{ label:"주간", sub: daySub }, { label:"야간", sub: nightSub }].map(({ label, sub }) => (
-            <div key={label} className="flex items-center gap-2">
-              <span className="w-6 shrink-0" />
-              <span className="text-xs text-gray-500 w-7 shrink-0">{label}</span>
-              <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
-              {sub ? (
-                <>
-                  <RankBadge rank={sub.user?.rank} size="sm" />
-                  <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
-                  <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
-                </>
-              ) : (
-                <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">미정</span>
-              )}
-            </div>
-          ))}
-        </div>
-        {!hasAll && (
-          <button onClick={onAddSub}
-            className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95">
-            <UserPlus size={12} />
-            등록
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // 단일 대체자
-  if (singleSub) {
-    return <SingleRow sub={singleSub} />;
-  }
-
+  // 당번: 주간/야간 각각 (전체현황처럼 우측에 버튼 하나만 배치)
   if (isDuty) {
     return (
       <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1 flex-1">
-          {[{ label:"🌞 주간", sub: daySub }, { label:"🌙 야간", sub: nightSub }].map(({ label, sub }) => (
-            <div key={label} className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 w-14">{label}</span>
-              {sub ? (
-                <div className="flex items-center gap-1.5">
-                  <RankBadge rank={sub.user?.rank} size="sm" />
-                  <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
-                  <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
-                </div>
-              ) : (
-                <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
-              )}
-            </div>
-          ))}
+        <div className="flex flex-col gap-1.5 flex-1">
+          <SingleRow sub={daySub} label="주간" />
+          <SingleRow sub={nightSub} label="야간" />
         </div>
         {!hasAll && (
           <button onClick={onAddSub}
@@ -406,14 +386,6 @@ function SubstituteDisplay({ inc, onAddSub }) {
     );
   }
 
-  return (
-    <div className="flex items-center justify-between">
-      <span className="text-xs text-orange-400 bg-orange-50 font-bold px-3 py-1 rounded-full">대체자 미정</span>
-      <button onClick={onAddSub}
-        className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full">
-        <UserPlus size={12} />
-        대체자 등록
-      </button>
-    </div>
-  );
+  // 단일 대체자 (지각/조퇴 포함 일반 상급)
+  return <SingleRow sub={singleSub} onAdd={!singleSub ? onAddSub : null} />;
 }

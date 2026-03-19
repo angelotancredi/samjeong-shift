@@ -167,7 +167,9 @@ export default function IncidentRegister() {
           {(form.startTime || form.endTime) && (
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-gray-500">시간</span>
-              <span className="text-sm font-semibold text-gray-900">{form.startTime}~{form.endTime}</span>
+              <span className="text-sm font-semibold text-gray-900">
+                {form.startTime?.split(':')[0]}~{form.endTime?.split(':')[0]}
+              </span>
             </div>
           )}
           <div className="h-px bg-gray-200" />

@@ -11,13 +11,30 @@
 
 html, body, #root {
   height: 100%;
-  margin: 0;
   padding: 0;
+  margin: 0;
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: #f8fafc;
-  color: #111827;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+}
+
+body {
+  color: #111827;
+  /* 텍스트 선택 및 시스템 팝업 차단 */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* 입력창 및 텍스트 영역은 선택 허용 */
+input, textarea, [contenteditable="true"] {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 .safe-bottom {
