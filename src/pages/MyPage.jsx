@@ -136,16 +136,19 @@ export default function MyPage() {
                 <p className="text-xs text-gray-600">{sub.date ? formatDateKo(sub.date + "T00:00:00") : "-"}</p>
                 <span className="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">대기완료</span>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <RankBadge rank={sub.incidentUser?.rank} size="sm" />
-                <div>
-                  <span className="text-sm font-medium text-gray-800">{sub.incidentUser?.name}</span>
-                  <span className="text-xs text-gray-600 ml-1">
-                    ({sub.reason}
-                    {(sub.reason === "지각" || sub.reason === "조퇴") && sub.startTime && sub.endTime ? ` ${sub.startTime.split(":")[0]}~${sub.endTime.split(":")[0]}` : ""}
-                    {sub.shift && sub.shift !== "지각/조퇴" ? ` · ${sub.shift}` : ""})
+                <span className="text-sm font-medium text-gray-800">{sub.incidentUser?.name}</span>
+                <span className="text-xs text-gray-600">
+                  ({sub.reason}
+                  {(sub.reason === "지각" || sub.reason === "조퇴") && sub.startTime && sub.endTime ? ` ${sub.startTime.split(":")[0]}~${sub.endTime.split(":")[0]}` : ""}
+                  {sub.shift ? ` · ${sub.shift}` : ""})
+                </span>
+                {sub.subShift && (
+                  <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${sub.subShift === "주간" ? "bg-blue-100 text-blue-600" : "bg-violet-100 text-violet-600"}`}>
+                    {sub.subShift}
                   </span>
-                </div>
+                )}
               </div>
             </div>
           ))
