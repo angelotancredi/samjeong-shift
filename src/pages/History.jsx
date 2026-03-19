@@ -25,6 +25,7 @@ export default function History() {
   const [deleteId, setDeleteId] = useState(null);
   const [addSubIncident, setAddSubIncident] = useState(null);
   const [filterMissing, setFilterMissing] = useState(false);
+  const [filterMyWork, setFilterMyWork] = useState(false);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -51,6 +52,10 @@ export default function History() {
     .filter((i) => !filterTeam || String(i.user?.team) === filterTeam)
     .filter((i) => !filterDuty || i.duty === filterDuty)
     .filter((i) => !filterMissing || isPartialOrMissing(i))
+    .filter((i) => !filterMyWork || (
+      i.userId === profile?._id ||
+      i.substitutes?.some((s) => s.substituteUserId === profile?._id)
+    ))
     .sort((a, b) => b.date.localeCompare(a.date));
 
   return (
@@ -126,24 +131,34 @@ export default function History() {
       </div>
 
       {/* 요약 */}
-      <div className="flex gap-3 px-4 py-3">
-        <div className="flex-1 bg-slate-100 rounded-xl px-4 py-3 shadow-sm text-center cursor-pointer"
-          onClick={() => setFilterMissing(false)}>
-          <p className="text-2xl font-bold text-slate-500">{allIncidents.length}</p>
-          <p className="text-xs text-gray-600">전체</p>
-        </div>
-        <div className="flex-1 bg-sky-100 rounded-xl px-4 py-3 shadow-sm text-center cursor-pointer"
-          onClick={() => setFilterMissing(false)}>
+      <div className="flex gap-2 px-4 py-3">
+        {/* 대체완료 */}
+        <div className="flex-1 bg-sky-100 rounded-xl px-3 py-3 shadow-sm text-center cursor-pointer"
+          onClick={() => { setFilterMissing(false); setFilterMyWork(false); }}>
           <p className="text-2xl font-bold text-sky-500">{allIncidents.filter((i) => !isPartialOrMissing(i)).length}</p>
           <p className="text-xs text-gray-600">대체완료</p>
         </div>
-        <div onClick={() => setFilterMissing(!filterMissing)}
-          className={`flex-1 rounded-xl px-4 py-3 shadow-sm text-center cursor-pointer transition-all ${filterMissing ? "bg-rose-500 ring-2 ring-rose-400" : "bg-rose-100"}`}>
+        {/* 대체자 미정 */}
+        <div onClick={() => { setFilterMyWork(false); setFilterMissing(!filterMissing); }}
+          className={`flex-1 rounded-xl px-3 py-3 shadow-sm text-center cursor-pointer transition-all ${filterMissing ? "bg-rose-500 ring-2 ring-rose-400" : "bg-rose-100"}`}>
           <p className={`text-2xl font-bold ${filterMissing ? "text-white" : "text-rose-400"}`}>
             {allIncidents.filter((i) => isPartialOrMissing(i)).length}
           </p>
           <p className={`text-xs font-medium ${filterMissing ? "text-rose-100" : "text-gray-600"}`}>
-            {filterMissing ? "미정만 보기 ✓" : "대체자 미정"}
+            {filterMissing ? "미정만 ✓" : "대체자 미정"}
+          </p>
+        </div>
+        {/* 내 근무 */}
+        <div onClick={() => { setFilterMissing(false); setFilterMyWork(!filterMyWork); }}
+          className={`flex-1 rounded-xl px-3 py-3 shadow-sm text-center cursor-pointer transition-all ${filterMyWork ? "bg-violet-500 ring-2 ring-violet-400" : "bg-violet-100"}`}>
+          <p className={`text-2xl font-bold ${filterMyWork ? "text-white" : "text-violet-500"}`}>
+            {allIncidents.filter((i) =>
+              i.userId === profile?._id ||
+              i.substitutes?.some((s) => s.substituteUserId === profile?._id)
+            ).length}
+          </p>
+          <p className={`text-xs font-medium ${filterMyWork ? "text-violet-100" : "text-gray-600"}`}>
+            {filterMyWork ? "내 근무 ✓" : "내 근무"}
           </p>
         </div>
       </div>
