@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Search, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import RankBadge from "./RankBadge";
+import { useAuth } from "../context/AuthContext";
 
 export default function AddSubstituteModal({ incident, users, onClose, onDone }) {
+  const { profile } = useAuth();
   const isDuty = incident?.shift === "당번";
   const addSubstitute = useMutation(api.substitutes.addSubstitute);
   const addSubstituteDuty = useMutation(api.substitutes.addSubstituteDuty);
@@ -14,6 +16,10 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
   const existingNight = incident?.substitutes?.find((s) => s.subShift === "야간");
   const existingSingle = !isDuty && incident?.substitutes?.[0];
 
+  // 현재 사용자만 필터링
+  const filtered = users.filter((u) => u._id === profile?._id);
+  
+  // 현재 사용자가 있는 경우 자동으로 선택하도록 설정
   const [selectedId, setSelectedId] = useState(existingSingle?.user?._id ?? existingSingle?.substituteUserId ?? null);
 
   const [activeSlot, setActiveSlot] = useState("day");
@@ -22,15 +28,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
   const [nightId, setNightId] = useState(existingNight?.user?._id ?? existingNight?.substituteUserId ?? null);
   const [nightUser, setNightUser] = useState(existingNight?.user ?? null);
 
-  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const filtered = users
-    .filter((u) =>
-      u._id !== incident?.userId &&
-      (u.name.includes(search) || String(u.team).includes(search) || u.rank.includes(search))
-    )
-    .sort((a, b) => a.team - b.team || (a.name || "").localeCompare(b.name || ""));
 
   const handleSelectDuty = (u) => {
     if (activeSlot === "day") {
@@ -79,7 +77,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col">
+      <div className="relative mt-auto bg-white rounded-t-3xl max-h-[50vh] flex flex-col">
         <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-3 mb-1" />
 
         {/* 헤더 */}
@@ -136,19 +134,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
           </div>
         )}
 
-        {/* 검색 */}
-        <div className="px-5 pt-3 pb-1">
-          <div className="relative">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="이름, 팀, 계급 검색"
-              className="w-full pl-9 pr-4 py-2.5 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
+
 
         {/* 직원 목록 */}
         <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-2">

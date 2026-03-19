@@ -23,7 +23,9 @@ export const listByMonth = query({
             return { ...s, user: subUser };
           })
         );
-        return { ...inc, user, substitutes };
+        // registeredBy 필드가 없을 경우 userId로 대체 (기존 데이터 호환)
+        const registeredBy = inc.registeredBy || inc.userId;
+        return { ...inc, user, substitutes, registeredBy };
       })
     );
   },
@@ -52,7 +54,9 @@ export const listByUser = query({
             return { ...s, user: subUser };
           })
         );
-        return { ...inc, user, substitutes };
+        // registeredBy 필드가 없을 경우 userId로 대체 (기존 데이터 호환)
+        const registeredBy = inc.registeredBy || inc.userId;
+        return { ...inc, user, substitutes, registeredBy };
       })
     );
   },

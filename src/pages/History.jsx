@@ -231,30 +231,45 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
       {/* 대체 정보 */}
       <div className="mt-1 pt-2 border-t border-gray-100">
         {inc.reason === "지각" || inc.reason === "조퇴" ? (
-          // 지각/조퇴: 대체근무자 표시
+          // 지각/조퇴: 대체자 있으면 표시, 없으면 미정 + 등록 버튼
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col gap-1 flex-1">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500 w-14">
-                  {inc.reason === "지각" ? "지각" : "조퇴"}
-                </span>
-                <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
-              </div>
+              {singleSub ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 w-14">{inc.reason}</span>
+                  <RankBadge rank={singleSub.user?.rank} size="sm" />
+                  <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
+                  <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
+                  {(profile?.isAdmin || profile?._id === inc.registeredBy) && (
+                    <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
+                      className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
+                      <Trash2 size={13} />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500 w-14">{inc.reason}</span>
+                  <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
+                </div>
+              )}
             </div>
+            {!singleSub && (
               <button onClick={onAddSub}
                 className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
                 <UserPlus size={12} />
                 대체자 등록
               </button>
+            )}
           </div>
         ) : isDuty ? (
           // 당번: 주간/야간 각각 표시
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col gap-1 flex-1">
-              <SubRow label="주간" sub={daySub} missing={!daySub}
-                onRemove={daySub ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "주간" }) : undefined} />
+               <SubRow label="주간" sub={daySub} missing={!daySub}
+                onRemove={daySub && (profile?.isAdmin || profile?._id === inc.registeredBy) ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "주간" }) : undefined} />
               <SubRow label="야간" sub={nightSub} missing={!nightSub}
-                onRemove={nightSub ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "야간" }) : undefined} />
+                onRemove={nightSub && (profile?.isAdmin || profile?._id === inc.registeredBy) ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "야간" }) : undefined} />
             </div>
             {isPartialOrMissing && (
               <button onClick={onAddSub}
@@ -272,10 +287,12 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
               <RankBadge rank={singleSub.user?.rank} size="sm" />
               <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
               <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
-              <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
-                className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
-                <Trash2 size={13} />
-              </button>
+               {(profile?.isAdmin || profile?._id === inc.registeredBy) && (
+                <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
+                  className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
+                  <Trash2 size={13} />
+                </button>
+              )}
             </div>
           </div>
         ) : (
