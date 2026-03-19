@@ -330,12 +330,10 @@ function DraggableTeamList({ team, teamUsers, teamStyle, profile, onToggleAdmin,
             <GripVertical size={16} />
           </div>
           <RankBadge rank={u.rank} size="sm" />
-          <div className="flex-1">
-            <div className="flex items-center gap-1.5">
-              <span className="font-medium text-black text-sm">{u.name}</span>
-              {u.isAdmin && <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-bold">관리자</span>}
-            </div>
-            <p className="text-xs text-gray-600">{u.rank}</p>
+          <div className="flex-1 flex items-center gap-2">
+            <span className="font-bold text-gray-900 text-sm">{u.name}</span>
+            <span className="text-xs text-gray-500 font-medium">{u.rank}</span>
+            {u.isAdmin && <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-bold ml-1">관리자</span>}
           </div>
           <button onClick={() => onToggleAdmin(u)}
             className={`p-1.5 rounded-lg transition-colors ${u.isAdmin ? "text-blue-500 bg-blue-50" : "text-gray-500 hover:bg-gray-50"}`}>
