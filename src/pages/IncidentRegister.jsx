@@ -7,6 +7,7 @@ import { useAuth } from "../context/AuthContext";
 import RankBadge from "../components/RankBadge";
 import NotificationBell from "../components/NotificationBell";
 import { SHIFT_TYPES, ABSENCE_REASONS, DUTY_ROLES, toDateString, formatDateKo } from "../utils/constants";
+import { useModalDrag } from "../hooks/useModalDrag";
 
 export default function IncidentRegister() {
   const navigate = useNavigate();
@@ -689,6 +690,8 @@ function DutySelector({ value, onChange }) {
     setOpen(false);
   };
 
+  const { dragStyle, bind } = useModalDrag(() => setOpen(false));
+
   // 업무 카테고리 그룹핑
   const groups = [
     { label: "1선 펌프", items: ["팀장", "1선펌프기관", "1선펌프경방"] },
@@ -726,9 +729,14 @@ function DutySelector({ value, onChange }) {
       {open && (
         <div className="fixed inset-0 z-50 flex flex-col">
           <div className="absolute inset-0 bg-black/30" onClick={() => setOpen(false)} />
-          <div className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col">
+          <div
+            className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col overscroll-none shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
+            style={dragStyle}
+          >
             {/* 핸들 */}
-            <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-3 mb-1 flex-shrink-0" />
+            <div className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none" {...bind}>
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
+            </div>
 
             {/* 헤더 */}
             <div className="px-5 py-4 border-b border-gray-100 flex-shrink-0">
@@ -787,5 +795,3 @@ function DutySelector({ value, onChange }) {
     </>
   );
 }
-
-

@@ -5,12 +5,15 @@ import { api } from "../../convex/_generated/api";
 import RankBadge from "./RankBadge";
 import { useAuth } from "../context/AuthContext";
 import { formatDateKo } from "../utils/constants";
+import { useModalDrag } from "../hooks/useModalDrag";
 
 export default function AddSubstituteModal({ incident, users, onClose, onDone }) {
   const { profile } = useAuth();
   const isDuty = incident?.shift === "당번";
   const addSubstitute = useMutation(api.substitutes.addSubstitute);
   const addSubstituteDuty = useMutation(api.substitutes.addSubstituteDuty);
+
+  const { dragStyle, bind } = useModalDrag(onClose);
 
   // 기존 대체자 정보
   const existingDay = incident?.substitutes?.find((s) => s.subShift === "주간");
@@ -77,9 +80,12 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
-      <div className="absolute inset-0 bg-black/30" onClick={(e) => { e.stopPropagation(); onClose(); }} />
-      <div className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col">
-        <div className="w-full pt-3 pb-2">
+      <div className="absolute inset-0 bg-black/30 animate-fade-in" onClick={onClose} />
+      <div
+        className="relative mt-auto bg-white rounded-t-3xl max-h-[85vh] flex flex-col overscroll-none shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
+        style={dragStyle}
+      >
+        <div className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none" {...bind}>
           <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
         </div>
 

@@ -9,6 +9,7 @@ import RankBadge from "../components/RankBadge";
 import BottomNav from "../components/BottomNav";
 import { getDutyTeam, toDateString, formatDateKo } from "../utils/constants";
 import AddSubstituteModal from "../components/AddSubstituteModal";
+import { useModalDrag } from "../hooks/useModalDrag";
 
 const TEAM_COLORS = {
   1: { bg: "bg-blue-100", text: "text-blue-700", dot: "bg-blue-500" },
@@ -250,8 +251,7 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
   const dutyTeam = cycleBase ? getDutyTeam(date, cycleBase) : null;
   const tc = dutyTeam ? { 1:{text:"text-blue-700"}, 2:{text:"text-emerald-700"}, 3:{text:"text-violet-700"} }[dutyTeam] : null;
 
-  const [dragY, setDragY] = useState(0);
-  const touchStartY = useRef(null);
+  const { dragStyle, bind } = useModalDrag(onClose);
 
   // 뒤로가기 버튼 처리
   useEffect(() => {
@@ -265,33 +265,14 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
     return () => window.removeEventListener("popstate", handlePopState);
   }, [onClose]);
 
-  const onTouchStart = (e) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-  const onTouchMove = (e) => {
-    const diff = e.touches[0].clientY - touchStartY.current;
-    if (diff > 0) setDragY(diff);
-  };
-  const onTouchEnd = () => {
-    if (dragY > 100) {
-      onClose();
-    } else {
-      setDragY(0);
-    }
-    touchStartY.current = null;
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       <div className="absolute inset-0 bg-black/40 animate-fade-in" onClick={onClose} />
       <div
-        className="relative mt-auto bg-white rounded-t-[32px] h-[80vh] flex flex-col shadow-[0_-8px_30px_rgb(0,0,0,0.12)]"
-        style={{ transform: `translateY(${dragY}px)`, transition: dragY === 0 ? "transform 0.2s ease-out" : "none" }}
-        onTouchStart={onTouchStart}
-        onTouchMove={onTouchMove}
-        onTouchEnd={onTouchEnd}
+        className="relative mt-auto bg-white rounded-t-[32px] h-[80vh] flex flex-col shadow-[0_-8px_30px_rgb(0,0,0,0.12)] overscroll-none"
+        style={dragStyle}
       >
-        <div className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing">
+        <div className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none" {...bind}>
           <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
         </div>
         <div className="px-5 py-4 border-b border-gray-100">

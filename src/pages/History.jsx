@@ -8,6 +8,7 @@ import BottomNav from "../components/BottomNav";
 import NotificationBell from "../components/NotificationBell";
 import AddSubstituteModal from "../components/AddSubstituteModal";
 import { formatDateKo, ABSENCE_REASONS, DUTY_ROLES } from "../utils/constants";
+import { useModalDrag } from "../hooks/useModalDrag";
 
 const REASON_COLORS = {
   연가:"bg-blue-100 text-blue-700", 병가:"bg-red-100 text-red-700",
@@ -26,6 +27,8 @@ export default function History() {
   const [addSubIncident, setAddSubIncident] = useState(null);
   const [filterMissing, setFilterMissing] = useState(false);
   const [filterMyWork, setFilterMyWork] = useState(false);
+
+  const { dragStyle: delDragStyle, bind: delBind } = useModalDrag(() => setDeleteId(null));
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -184,15 +187,23 @@ export default function History() {
 
       {/* 삭제 확인 모달 */}
       {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-end">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setDeleteId(null)} />
-          <div className="relative w-full bg-white rounded-t-3xl p-6">
-            <h3 className="font-bold text-lg text-black mb-2">삭제하시겠습니까?</h3>
-            <p className="text-gray-700 text-sm mb-5">이 내역을 삭제하면 복구할 수 없습니다.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteId(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
-              <button onClick={async () => { await removeIncident({ id: deleteId }); setDeleteId(null); }}
-                className="flex-1 py-3.5 bg-red-500 rounded-xl font-semibold text-white">삭제</button>
+        <div className="fixed inset-0 z-50 flex flex-col">
+          <div className="absolute inset-0 bg-black/30 animate-fade-in" onClick={() => setDeleteId(null)} />
+          <div
+            className="relative mt-auto w-full bg-white rounded-t-3xl shadow-[0_-8px_30px_rgb(0,0,0,0.12)] overscroll-none"
+            style={delDragStyle}
+          >
+            <div className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none" {...delBind}>
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
+            </div>
+            <div className="p-6 pt-2">
+              <h3 className="font-bold text-lg text-black mb-2">삭제하시겠습니까?</h3>
+              <p className="text-gray-700 text-sm mb-5">이 내역을 삭제하면 복구할 수 없습니다.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeleteId(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
+                <button onClick={async () => { await removeIncident({ id: deleteId }); setDeleteId(null); }}
+                  className="flex-1 py-3.5 bg-red-500 rounded-xl font-semibold text-white">삭제</button>
+              </div>
             </div>
           </div>
         </div>
@@ -220,6 +231,8 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
   const nightSub = inc.substitutes?.find((s) => s.subShift === "야간");
   const singleSub = !isDuty && inc.substitutes?.[0];
   const removeSubstitute = useMutation(api.substitutes.removeSubstitute);
+
+  const { dragStyle: subDelDragStyle, bind: subDelBind } = useModalDrag(() => setDeleteSubInfo(null));
 
   return (
     <div className="bg-white rounded-2xl p-3 shadow-sm">
@@ -343,15 +356,23 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
 
       {/* 대체자 삭제 확인 모달 */}
       {deleteSubInfo && (
-        <div className="fixed inset-0 z-50 flex items-end">
-          <div className="absolute inset-0 bg-black/30" onClick={() => setDeleteSubInfo(null)} />
-          <div className="relative w-full bg-white rounded-t-3xl p-6">
-            <h3 className="font-bold text-lg text-black mb-2">대체자를 삭제하시겠습니까?</h3>
-            <p className="text-gray-700 text-sm mb-5">이 대체자 정보를 삭제하면 복구할 수 없습니다.</p>
-            <div className="flex gap-3">
-              <button onClick={() => setDeleteSubInfo(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
-              <button onClick={async () => { await removeSubstitute(deleteSubInfo); setDeleteSubInfo(null); }}
-                className="flex-1 py-3.5 bg-red-500 rounded-xl font-semibold text-white">삭제</button>
+        <div className="fixed inset-0 z-50 flex flex-col">
+          <div className="absolute inset-0 bg-black/30 animate-fade-in" onClick={() => setDeleteSubInfo(null)} />
+          <div
+            className="relative mt-auto w-full bg-white rounded-t-3xl shadow-[0_-8px_30px_rgb(0,0,0,0.12)] overscroll-none"
+            style={subDelDragStyle}
+          >
+            <div className="w-full pt-3 pb-2 cursor-grab active:cursor-grabbing touch-none" {...subDelBind}>
+              <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
+            </div>
+            <div className="p-6 pt-2">
+              <h3 className="font-bold text-lg text-black mb-2">대체자를 삭제하시겠습니까?</h3>
+              <p className="text-gray-700 text-sm mb-5">이 대체자 정보를 삭제하면 복구할 수 없습니다.</p>
+              <div className="flex gap-3">
+                <button onClick={() => setDeleteSubInfo(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
+                <button onClick={async () => { await removeSubstitute(deleteSubInfo); setDeleteSubInfo(null); }}
+                  className="flex-1 py-3.5 bg-red-500 rounded-xl font-semibold text-white">삭제</button>
+              </div>
             </div>
           </div>
         </div>
