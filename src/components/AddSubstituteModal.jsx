@@ -4,6 +4,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import RankBadge from "./RankBadge";
 import { useAuth } from "../context/AuthContext";
+import { formatDateKo } from "../utils/constants";
 
 export default function AddSubstituteModal({ incident, users, onClose, onDone }) {
   const { profile } = useAuth();
@@ -11,18 +12,23 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
   const addSubstitute = useMutation(api.substitutes.addSubstitute);
   const addSubstituteDuty = useMutation(api.substitutes.addSubstituteDuty);
 
-  // 기존 대체자 정보 초기값으로 설정
+  // 기존 대체자 정보
   const existingDay = incident?.substitutes?.find((s) => s.subShift === "주간");
   const existingNight = incident?.substitutes?.find((s) => s.subShift === "야간");
   const existingSingle = !isDuty && incident?.substitutes?.[0];
 
-  // 현재 사용자만 필터링
-  const filtered = users.filter((u) => u._id === profile?._id);
-  
-  // 현재 사용자가 있는 경우 자동으로 선택하도록 설정
-  const [selectedId, setSelectedId] = useState(existingSingle?.user?._id ?? existingSingle?.substituteUserId ?? null);
+  // 이미 등록된 슬롯 여부
+  const dayLocked = !!existingDay;
+  const nightLocked = !!existingNight;
 
-  const [activeSlot, setActiveSlot] = useState("day");
+  // 본인만 목록에 표시, 기본값은 미선택(null)
+  const filtered = users.filter((u) => u._id === profile?._id);
+
+  const [selectedId, setSelectedId] = useState(null); // 기본 미선택
+
+  const [activeSlot, setActiveSlot] = useState(
+    dayLocked && !nightLocked ? "night" : "day" // 주간 잠김이면 야간으로 시작
+  );
   const [dayId, setDayId] = useState(existingDay?.user?._id ?? existingDay?.substituteUserId ?? null);
   const [dayUser, setDayUser] = useState(existingDay?.user ?? null);
   const [nightId, setNightId] = useState(existingNight?.user?._id ?? existingNight?.substituteUserId ?? null);
@@ -69,38 +75,51 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
     }
   };
 
-  // 단일 대체자 기존 유저 찾기
-  const selectedUser = !isDuty && selectedId
-    ? users.find((u) => u._id === selectedId)
-    : null;
-
   return (
     <div className="fixed inset-0 z-50 flex flex-col">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative mt-auto bg-white rounded-t-3xl max-h-[50vh] flex flex-col">
+      <div className="relative mt-auto bg-white rounded-t-3xl max-h-[60vh] flex flex-col">
         <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto mt-3 mb-1" />
 
         {/* 헤더 */}
         <div className="px-5 py-4 border-b border-gray-100">
           <h3 className="font-bold text-lg text-black">대체근무자 지정</h3>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {isDuty ? "주간·야간 각각 선택해주세요" : "대체할 직원을 선택해주세요"}
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            {/* 날짜 표시 */}
+            {incident?.date && (
+              <span className="text-xs text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-full">
+                {formatDateKo(incident.date)}
+              </span>
+            )}
+            <span className="text-xs text-gray-500">
+              {isDuty ? "주간·야간 각각 선택해주세요" : "대체할 직원을 선택해주세요"}
+            </span>
+          </div>
         </div>
 
         {/* 당번: 주간/야간 슬롯 */}
         {isDuty && (
           <div className="px-5 pt-3 grid grid-cols-2 gap-2">
+            {/* 주간 슬롯 */}
             <button
-              onClick={() => setActiveSlot("day")}
+              onClick={() => !dayLocked && setActiveSlot("day")}
+              disabled={dayLocked}
               className={`rounded-xl p-3 border-2 text-left transition-all ${
-                activeSlot === "day" ? "border-blue-500 bg-blue-50" : "border-gray-100 bg-gray-50"
+                dayLocked
+                  ? "border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed"
+                  : activeSlot === "day"
+                  ? "border-blue-500 bg-blue-50"
+                  : "border-gray-100 bg-gray-50"
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <p className={`text-xs font-bold ${activeSlot === "day" ? "text-blue-500" : "text-gray-400"}`}>주간</p>
-                {dayUser && <button type="button" onClick={(e) => { e.stopPropagation(); setDayId(null); setDayUser(null); }}
-                  className="text-gray-300 hover:text-red-400 text-xs font-bold leading-none">✕</button>}
+                <p className={`text-xs font-bold ${dayLocked ? "text-gray-400" : activeSlot === "day" ? "text-blue-500" : "text-gray-400"}`}>
+                  주간 {dayLocked && <span className="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-full ml-1">등록완료</span>}
+                </p>
+                {dayUser && !dayLocked && (
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setDayId(null); setDayUser(null); }}
+                    className="text-gray-300 hover:text-red-400 text-xs font-bold leading-none">✕</button>
+                )}
               </div>
               {dayUser ? (
                 <div className="flex items-center gap-1.5">
@@ -111,16 +130,27 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                 <p className="text-xs font-bold text-orange-400">미정</p>
               )}
             </button>
+
+            {/* 야간 슬롯 */}
             <button
-              onClick={() => setActiveSlot("night")}
+              onClick={() => !nightLocked && setActiveSlot("night")}
+              disabled={nightLocked}
               className={`rounded-xl p-3 border-2 text-left transition-all ${
-                activeSlot === "night" ? "border-violet-500 bg-violet-50" : "border-gray-100 bg-gray-50"
+                nightLocked
+                  ? "border-gray-100 bg-gray-50 opacity-60 cursor-not-allowed"
+                  : activeSlot === "night"
+                  ? "border-violet-500 bg-violet-50"
+                  : "border-gray-100 bg-gray-50"
               }`}
             >
               <div className="flex items-center justify-between mb-1">
-                <p className={`text-xs font-bold ${activeSlot === "night" ? "text-violet-500" : "text-gray-400"}`}>야간</p>
-                {nightUser && <button type="button" onClick={(e) => { e.stopPropagation(); setNightId(null); setNightUser(null); }}
-                  className="text-gray-300 hover:text-red-400 text-xs font-bold leading-none">✕</button>}
+                <p className={`text-xs font-bold ${nightLocked ? "text-gray-400" : activeSlot === "night" ? "text-violet-500" : "text-gray-400"}`}>
+                  야간 {nightLocked && <span className="text-[10px] bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded-full ml-1">등록완료</span>}
+                </p>
+                {nightUser && !nightLocked && (
+                  <button type="button" onClick={(e) => { e.stopPropagation(); setNightId(null); setNightUser(null); }}
+                    className="text-gray-300 hover:text-red-400 text-xs font-bold leading-none">✕</button>
+                )}
               </div>
               {nightUser ? (
                 <div className="flex items-center gap-1.5">
@@ -134,9 +164,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
           </div>
         )}
 
-
-
-        {/* 직원 목록 */}
+        {/* 직원 목록 (본인만) */}
         <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-2">
           <div className="flex flex-col gap-1.5">
             {filtered.map((u) => {
