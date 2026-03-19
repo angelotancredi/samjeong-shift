@@ -40,7 +40,7 @@ export default function Login() {
           <Flame size={32} className="text-white" />
         </div>
         <h1 className="text-white text-2xl font-bold">삼정119안전센터</h1>
-        <p className="text-blue-200 text-sm mt-1">대체근무 관리 시스템</p>
+        <p className="text-blue-200 text-sm mt-1">대기근무 관리 시스템</p>
       </div>
 
       <div className="bg-white rounded-t-3xl px-6 pt-8 pb-12">

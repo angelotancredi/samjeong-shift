@@ -23,7 +23,7 @@ export const listByMonth = query({
             return { ...s, user: subUser };
           })
         );
-        // registeredBy 필드가 없을 경우 userId로 대체 (기존 데이터 호환)
+        // registeredBy 필드가 없을 경우 userId로 대기 (기존 데이터 호환)
         const registeredBy = inc.registeredBy || inc.userId;
         return { ...inc, user, substitutes, registeredBy };
       })
@@ -54,7 +54,7 @@ export const listByUser = query({
             return { ...s, user: subUser };
           })
         );
-        // registeredBy 필드가 없을 경우 userId로 대체 (기존 데이터 호환)
+        // registeredBy 필드가 없을 경우 userId로 대기 (기존 데이터 호환)
         const registeredBy = inc.registeredBy || inc.userId;
         return { ...inc, user, substitutes, registeredBy };
       })
@@ -62,7 +62,7 @@ export const listByUser = query({
   },
 });
 
-// 내가 대체한 기록
+// 내가 대기한 기록
 export const listSubstitutesByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
@@ -132,7 +132,7 @@ export const create = mutation({
     // 1. incident 저장
     const incidentId = await ctx.db.insert("incidents", incidentData);
 
-    // 2. 대체자 저장
+    // 2. 대기자 저장
     if (args.shift === "당번") {
       // 당번: 주간/야간 각각 subShift 태그와 함께 저장
       if (substituteUserId) {
@@ -150,7 +150,7 @@ export const create = mutation({
         });
       }
     } else {
-      // 주간/야간: 단일 대체자
+      // 주간/야간: 단일 대기자
       if (substituteUserId) {
         await ctx.db.insert("substitutes", { incidentId, substituteUserId });
       }
@@ -166,11 +166,11 @@ export const create = mutation({
         const parts = [];
         if (dayUser) parts.push(`주간: ${dayUser.name}`);
         if (nightUser) parts.push(`야간: ${nightUser.name}`);
-        subText = ` → 대체(${parts.join(", ")})`;
+        subText = ` → 대기(${parts.join(", ")})`;
       }
     } else {
       const subUser = substituteUserId ? await ctx.db.get(substituteUserId) : null;
-      if (subUser) subText = ` → 대체: ${subUser.name}`;
+      if (subUser) subText = ` → 대기: ${subUser.name}`;
     }
 
     const dutyText = args.duty ? ` [${args.duty}]` : "";

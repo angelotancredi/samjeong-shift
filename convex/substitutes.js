@@ -11,7 +11,7 @@ async function sendNotification(ctx, incident, message) {
   );
 }
 
-// 주간/야간 단일 대체자 추가 (기존 전체 삭제 후 교체)
+// 주간/야간 단일 대기자 추가 (기존 전체 삭제 후 교체)
 export const addSubstitute = mutation({
   args: {
     incidentId: v.id("incidents"),
@@ -28,7 +28,7 @@ export const addSubstitute = mutation({
     const incident = await ctx.db.get(incidentId);
     const incidentUser = incident ? await ctx.db.get(incident.userId) : null;
     const subUser = await ctx.db.get(substituteUserId);
-    const message = `[${incident?.date}] ${incidentUser?.name} 대체근무자 지정: ${subUser?.name}`;
+    const message = `[${incident?.date}] ${incidentUser?.name} 대기근무자 지정: ${subUser?.name}`;
     await sendNotification(ctx, incident, message);
   },
 });
@@ -37,11 +37,11 @@ export const addSubstitute = mutation({
 export const addSubstituteDuty = mutation({
   args: {
     incidentId: v.id("incidents"),
-    dayUserId: v.optional(v.id("users")),   // 주간 대체자
-    nightUserId: v.optional(v.id("users")), // 야간 대체자
+    dayUserId: v.optional(v.id("users")),   // 주간 대기자
+    nightUserId: v.optional(v.id("users")), // 야간 대기자
   },
   handler: async (ctx, { incidentId, dayUserId, nightUserId }) => {
-    // 기존 대체자 전부 삭제
+    // 기존 대기자 전부 삭제
     const existing = await ctx.db
       .query("substitutes")
       .withIndex("by_incident", (q) => q.eq("incidentId", incidentId))
@@ -74,12 +74,12 @@ export const addSubstituteDuty = mutation({
     if (dayUser) parts.push(`주간: ${dayUser.name}`);
     if (nightUser) parts.push(`야간: ${nightUser.name}`);
     const subText = parts.length > 0 ? ` (${parts.join(", ")})` : "";
-    const message = `[${incident?.date}] ${incidentUser?.name} 당번 대체근무자 지정${subText}`;
+    const message = `[${incident?.date}] ${incidentUser?.name} 당번 대기근무자 지정${subText}`;
     await sendNotification(ctx, incident, message);
   },
 });
 
-// 대체자 단건 삭제
+// 대기자 단건 삭제
 export const removeSubstitute = mutation({
   args: { incidentId: v.id("incidents"), subShift: v.optional(v.string()) },
   handler: async (ctx, { incidentId, subShift }) => {
@@ -101,7 +101,7 @@ export const removeSubstitute = mutation({
     const incident = await ctx.db.get(incidentId);
     const incidentUser = incident ? await ctx.db.get(incident.userId) : null;
     const shiftText = subShift ? `(${subShift})` : "";
-    const message = `[${incident?.date}] ${incidentUser?.name} 대체근무자${shiftText} 취소`;
+    const message = `[${incident?.date}] ${incidentUser?.name} 대기근무자${shiftText} 취소`;
     await sendNotification(ctx, incident, message);
   },
 });

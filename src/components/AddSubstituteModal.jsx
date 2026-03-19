@@ -15,7 +15,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
 
   const { dragStyle, bind } = useModalDrag(onClose);
 
-  // 기존 대체자 정보
+  // 기존 대기자 정보
   const existingDay = incident?.substitutes?.find((s) => s.subShift === "주간");
   const existingNight = incident?.substitutes?.find((s) => s.subShift === "야간");
   const existingSingle = !isDuty && incident?.substitutes?.[0];
@@ -91,7 +91,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
 
         {/* 헤더 */}
         <div className="px-5 py-4 border-b border-gray-100">
-          <h3 className="font-bold text-lg text-black">대체근무자 지정</h3>
+          <h3 className="font-bold text-lg text-black">대기근무자 지정</h3>
           <div className="flex items-center gap-2 mt-1">
             {/* 날짜 표시 */}
             {incident?.date && (
@@ -135,7 +135,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                   <span className="text-xs font-bold text-black truncate">{dayUser.name}</span>
                 </div>
               ) : (
-                <p className="text-xs font-bold text-orange-400">대체자 미정</p>
+                <p className="text-xs font-bold text-orange-400">대기자 미정</p>
               )}
             </button>
 
@@ -166,7 +166,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                   <span className="text-xs font-bold text-black truncate">{nightUser.name}</span>
                 </div>
               ) : (
-                <p className="text-xs font-bold text-orange-400">대체자 미정</p>
+                <p className="text-xs font-bold text-orange-400">대기자 미정</p>
               )}
             </button>
           </div>

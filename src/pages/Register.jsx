@@ -60,7 +60,7 @@ export default function Register() {
           </div>
           <div>
             <p className="font-bold text-black">삼정119안전센터</p>
-            <p className="text-xs text-gray-700">대체근무 관리 시스템</p>
+            <p className="text-xs text-gray-700">대기근무 관리 시스템</p>
           </div>
         </div>
 

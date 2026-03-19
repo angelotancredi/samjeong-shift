@@ -135,20 +135,20 @@ export default function History() {
 
       {/* 요약 */}
       <div className="flex gap-2 px-4 py-3">
-        {/* 대체완료 */}
+        {/* 대기완료 */}
         <div className="flex-1 bg-sky-100 rounded-xl px-3 py-3 shadow-sm text-center cursor-pointer"
           onClick={() => { setFilterMissing(false); setFilterMyWork(false); }}>
           <p className="text-2xl font-bold text-sky-500">{allIncidents.filter((i) => !isPartialOrMissing(i)).length}</p>
-          <p className="text-xs text-gray-600">대체완료</p>
+          <p className="text-xs text-gray-600">대기완료</p>
         </div>
-        {/* 대체자 미정 */}
+        {/* 대기자 미정 */}
         <div onClick={() => { setFilterMyWork(false); setFilterMissing(!filterMissing); }}
           className={`flex-1 rounded-xl px-3 py-3 shadow-sm text-center cursor-pointer transition-all ${filterMissing ? "bg-rose-500 ring-2 ring-rose-400" : "bg-rose-100"}`}>
           <p className={`text-2xl font-bold ${filterMissing ? "text-white" : "text-rose-400"}`}>
             {allIncidents.filter((i) => isPartialOrMissing(i)).length}
           </p>
           <p className={`text-xs font-medium ${filterMissing ? "text-rose-100" : "text-gray-600"}`}>
-            {filterMissing ? "미정만 ✓" : "대체자 미정"}
+            {filterMissing ? "미정만 ✓" : "대기자 미정"}
           </p>
         </div>
         {/* 내 근무 */}
@@ -209,7 +209,7 @@ export default function History() {
         </div>
       )}
 
-      {/* 대체자 지정 모달 */}
+      {/* 대기자 지정 모달 */}
       {addSubIncident && (
         <AddSubstituteModal
           incident={addSubIncident}
@@ -263,19 +263,19 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
         )}
       </div>
 
-      {/* 대체 정보 */}
+      {/* 대기 정보 */}
       <div className="mt-1 pt-2 border-t border-gray-100">
         {inc.reason === "지각" || inc.reason === "조퇴" ? (
-          // 지각/조퇴: 대체자 있으면 표시, 없으면 미정 + 등록 버튼
+          // 지각/조퇴: 대기자 있으면 표시, 없으면 미정 + 등록 버튼
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col gap-1.5 flex-1">
               {singleSub ? (
                 <div className="flex items-center gap-2">
                   <span className="w-6 shrink-0" />
-                  <span className="w-7 shrink-0" />
+                  <span className="text-xs text-gray-500 w-7 shrink-0 text-right">{inc.reason}</span>
                   <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
                   <RankBadge rank={singleSub.user?.rank} size="sm" />
-                  <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
+                  <span className="text-sm font-semibold text-gray-900 truncate">{singleSub.user?.name}</span>
                   <span className="text-xs text-gray-500 shrink-0">{singleSub.user?.team}팀</span>
                   {(profile?.isAdmin || profile?._id === inc.registeredBy) && (
                     <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
@@ -287,9 +287,9 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
               ) : (
                 <div className="flex items-center gap-2">
                   <span className="w-6 shrink-0" />
-                  <span className="w-7 shrink-0" />
+                  <span className="text-xs text-gray-500 w-7 shrink-0 text-right">{inc.reason}</span>
                   <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
-                  <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">대체자 미정</span>
+                  <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">대기자 미정</span>
                 </div>
               )}
             </div>
@@ -297,7 +297,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
               <button onClick={onAddSub}
                 className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
                 <UserPlus size={12} />
-                대체자 등록
+                대기자 등록
               </button>
             )}
           </div>
@@ -314,15 +314,15 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
               <button onClick={onAddSub}
                 className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
                 <UserPlus size={12} />
-                대체자 등록
+                대기자 등록
               </button>
             )}
           </div>
         ) : singleSub ? (
-          // 주간/야간: 단일 대체자
+          // 주간/야간: 단일 대기자
           <div className="flex items-center gap-2">
             <span className="w-6 shrink-0" />
-            <span className="w-7 shrink-0" />
+            <span className="text-xs text-gray-500 w-7 shrink-0 text-right">{inc.shift}</span>
             <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
             <div className="flex items-center gap-1.5 flex-1 min-w-0">
               <RankBadge rank={singleSub.user?.rank} size="sm" />
@@ -341,20 +341,20 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-6 shrink-0" />
-              <span className="w-7 shrink-0" />
+              <span className="text-xs text-gray-500 w-7 shrink-0 text-right">{inc.shift}</span>
               <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
-              <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-1 rounded-full">대체자 미정</span>
+              <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-1 rounded-full">대기자 미정</span>
             </div>
             <button onClick={onAddSub}
               className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full active:scale-95 transition-transform">
               <UserPlus size={12} />
-              대체자 등록
+              대기자 등록
             </button>
           </div>
         )}
       </div>
 
-      {/* 대체자 삭제 확인 모달 */}
+      {/* 대기자 삭제 확인 모달 */}
       {deleteSubInfo && (
         <div className="fixed inset-0 z-50 flex flex-col">
           <div className="absolute inset-0 bg-black/30 animate-fade-in" onClick={() => setDeleteSubInfo(null)} />
@@ -366,8 +366,8 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
               <div className="w-12 h-1.5 bg-gray-200 rounded-full mx-auto" />
             </div>
             <div className="p-6 pt-2">
-              <h3 className="font-bold text-lg text-black mb-2">대체자를 삭제하시겠습니까?</h3>
-              <p className="text-gray-700 text-sm mb-5">이 대체자 정보를 삭제하면 복구할 수 없습니다.</p>
+              <h3 className="font-bold text-lg text-black mb-2">대기자를 삭제하시겠습니까?</h3>
+              <p className="text-gray-700 text-sm mb-5">이 대기자 정보를 삭제하면 복구할 수 없습니다.</p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteSubInfo(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
                 <button onClick={async () => { await removeSubstitute(deleteSubInfo); setDeleteSubInfo(null); }}
@@ -400,7 +400,7 @@ function SubRow({ label, sub, missing, onRemove }) {
           )}
         </div>
       ) : (
-        <span className="text-xs text-orange-400 font-bold bg-orange-50 px-2 py-0.5 rounded-full">대체자 미정</span>
+        <span className="text-xs text-orange-400 font-bold bg-orange-50 px-2 py-0.5 rounded-full">대기자 미정</span>
       )}
     </div>
   );

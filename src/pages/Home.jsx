@@ -327,7 +327,7 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
   );
 }
 
-// 대체근무자 표시 — 전체현황과 동일 구조
+// 대기근무자 표시 — 전체현황과 동일 구조
 function SubstituteDisplay({ inc, onAddSub }) {
   const isDuty = inc.shift === "당번";
   const isLateLeave = inc.reason === "지각" || inc.reason === "조퇴";
@@ -351,19 +351,19 @@ function SubstituteDisplay({ inc, onAddSub }) {
           <span className="text-xs text-gray-500 shrink-0">{sub.user?.team}팀</span>
         </div>
       ) : (
-        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">대체자 미정</span>
+        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">대기자 미정</span>
       )}
       {!sub && onAdd && (
         <button onClick={onAdd}
           className="ml-auto flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
-          <UserPlus size={12} />대체자 등록
+          <UserPlus size={12} />대기자 등록
         </button>
       )}
     </div>
   );
 
   if (isLateLeave) {
-    return <SubLine sub={singleSub} onAdd={!singleSub ? onAddSub : null} />;
+    return <SubLine label={inc.reason} sub={singleSub} onAdd={!singleSub ? onAddSub : null} />;
   }
 
   if (isDuty) {
@@ -376,7 +376,7 @@ function SubstituteDisplay({ inc, onAddSub }) {
         {!hasAll && (
           <button onClick={onAddSub}
             className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
-            <UserPlus size={12} />대체자 등록
+            <UserPlus size={12} />대기자 등록
           </button>
         )}
       </div>
@@ -384,20 +384,20 @@ function SubstituteDisplay({ inc, onAddSub }) {
   }
 
   if (singleSub) {
-    return <SubLine sub={singleSub} />;
+    return <SubLine label={inc.shift} sub={singleSub} />;
   }
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <span className="w-6 shrink-0" />
-        <span className="w-7 shrink-0" />
+        <span className="text-xs text-gray-500 w-7 shrink-0 text-right">{inc.reason === "지각" || inc.reason === "조퇴" ? inc.reason : inc.shift}</span>
         <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
-        <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-0.5 rounded-full">대체자 미정</span>
+        <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-0.5 rounded-full">대기자 미정</span>
       </div>
       <button onClick={onAddSub}
-        className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full">
-        <UserPlus size={12} />대체자 등록
+        className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full active:scale-95 transition-transform">
+        <UserPlus size={12} />대기자 등록
       </button>
     </div>
   );

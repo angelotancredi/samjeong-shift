@@ -182,27 +182,27 @@ export default function IncidentRegister() {
             <>
               {form.sub_day && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-500">주간 대체</span>
+                  <span className="text-xs font-medium text-gray-500">주간 대기</span>
                   <span className="text-sm font-bold text-blue-600">{form.sub_day.name}</span>
                 </div>
               )}
               {form.sub_night && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-500">야간 대체</span>
+                  <span className="text-xs font-medium text-gray-500">야간 대기</span>
                   <span className="text-sm font-bold text-violet-600">{form.sub_night.name}</span>
                 </div>
               )}
               {!form.sub_day && !form.sub_night && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-gray-500">대체자</span>
-                  <span className="text-sm font-bold text-orange-400">대체자 미정</span>
+                  <span className="text-xs font-medium text-gray-500">대기자</span>
+                  <span className="text-sm font-bold text-orange-400">대기자 미정</span>
                 </div>
               )}
             </>
           ) : (
             form.substitute_user && (
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-gray-500">대체자</span>
+                <span className="text-xs font-medium text-gray-500">대기자</span>
                 <span className="text-sm font-bold text-black">{form.substitute_user.name}</span>
               </div>
             )
@@ -248,7 +248,7 @@ export default function IncidentRegister() {
             <ChevronLeft size={24} className="text-gray-900" />
           </button>
           <h1 className="text-lg font-bold text-black tracking-tight">
-            {step === 1 ? "사고자 등록" : "대체근무자 지정"}
+            {step === 1 ? "사고자 등록" : "대기근무자 지정"}
           </h1>
         </div>
 
@@ -295,23 +295,23 @@ export default function IncidentRegister() {
                  alert("근무 구분을 선택해주세요.");
                  return;
                }
-               // 지각/조퇴도 항상 대체근무자 지정 단계로 이동
+               // 지각/조퇴도 항상 대기근무자 지정 단계로 이동
                setSearchQuery("");
                setStep(2);
              }}
              className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold text-base"
            >
-             다음 → 대체근무자 지정
+             다음 → 대기근무자 지정
            </button>
          ) : (
           <div className="flex gap-3">
-            {/* 대체자 없이 등록 — 항상 한 번 클릭으로 등록 */}
+            {/* 대기자 없이 등록 — 항상 한 번 클릭으로 등록 */}
             <button
               onClick={handleSubmit}
               disabled={loading}
               className="flex-1 py-4 border border-gray-200 rounded-xl font-semibold text-gray-800 text-sm"
             >
-              대체자 없이 등록
+              대기자 없이 등록
             </button>
             {/* 등록 완료 — 단일: 1명 선택 필요 / 당번: 1명 이상 선택 시 활성화 */}
             <button
@@ -361,7 +361,7 @@ function Step1({ form, update, profile }) {
           {/* 화면에 보여지는 예쁜 포맷 */}
           <div className="w-full px-4 py-3 bg-gray-50 rounded-xl flex items-center justify-between border border-transparent group-focus-within:border-blue-500 transition-all">
             <span className="text-sm font-semibold text-gray-900">
-              {form.date ? `${form.date} (${["일","월","화","수","목","금","토"][new Date(form.date).getDay()]})` : "날짜 선택 (대체자 미정)"}
+              {form.date ? `${form.date} (${["일","월","화","수","목","금","토"][new Date(form.date).getDay()]})` : "날짜 선택 (대기자 미정)"}
             </span>
             <CalendarIcon size={18} className="text-gray-400" />
           </div>
@@ -391,7 +391,7 @@ function Step1({ form, update, profile }) {
         </div>
         {!(form.reason === "지각" || form.reason === "조퇴") && form.shift === "당번" && (
           <p className="text-xs text-blue-500 mt-2 font-medium">
-            ℹ️ 당번은 주간·야간 대체근무자를 각각 지정할 수 있어요
+            ℹ️ 당번은 주간·야간 대기근무자를 각각 지정할 수 있어요
           </p>
         )}
       </div>
@@ -549,7 +549,7 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
           }`}
         >
           <p className={`text-xs font-bold mb-1.5 ${activeSlot === "day" ? "text-blue-500" : "text-gray-400"}`}>
-            🌞 주간 대체
+            🌞 주간 대기
           </p>
           {form.sub_day ? (
             <div className="flex items-center gap-2">
@@ -557,7 +557,7 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
               <span className="text-sm font-bold text-black truncate">{form.sub_day.name}</span>
             </div>
           ) : (
-            <p className="text-sm font-bold text-orange-400">대체자 미정</p>
+            <p className="text-sm font-bold text-orange-400">대기자 미정</p>
           )}
         </button>
         <button
@@ -567,7 +567,7 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
           }`}
         >
           <p className={`text-xs font-bold mb-1.5 ${activeSlot === "night" ? "text-violet-500" : "text-gray-400"}`}>
-            🌙 야간 대체
+            🌙 야간 대기
           </p>
           {form.sub_night ? (
             <div className="flex items-center gap-2">
@@ -575,7 +575,7 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
               <span className="text-sm font-bold text-black truncate">{form.sub_night.name}</span>
             </div>
           ) : (
-            <p className="text-sm font-bold text-orange-400">대체자 미정</p>
+            <p className="text-sm font-bold text-orange-400">대기자 미정</p>
           )}
         </button>
       </div>
@@ -584,9 +584,9 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
       <div className="bg-white rounded-2xl p-4 shadow-sm">
         <div className="flex items-center gap-2 mb-3">
           <h3 className="font-bold text-black">
-            {activeSlot === "day" ? "🌞 주간" : "🌙 야간"} 대체근무자 선택
+            {activeSlot === "day" ? "🌞 주간" : "🌙 야간"} 대기근무자 선택
           </h3>
-          <span className="text-xs text-gray-400">(선택 안 하면 대체자 미정)</span>
+          <span className="text-xs text-gray-400">(선택 안 하면 대기자 미정)</span>
         </div>
         <div className="relative mb-3">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -646,8 +646,8 @@ function Step2Single({ form, update, searchQuery, setSearchQuery, filteredUsers 
       </div>
 
       <div className="bg-white rounded-2xl p-4 shadow-sm">
-        <h3 className="font-bold text-black mb-1">대체근무자 선택</h3>
-        <p className="text-xs text-orange-400 font-medium mb-3">선택하지 않으면 대체자 미정으로 등록됩니다</p>
+        <h3 className="font-bold text-black mb-1">대기근무자 선택</h3>
+        <p className="text-xs text-orange-400 font-medium mb-3">선택하지 않으면 대기자 미정으로 등록됩니다</p>
         <div className="relative mb-3">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" />
           <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}

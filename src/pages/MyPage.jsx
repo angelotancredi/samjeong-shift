@@ -78,8 +78,8 @@ export default function MyPage() {
       <div className="flex gap-3 px-4 py-4">
         {[
           { icon: Calendar, color:"text-red-400", value: myIncidents.length, label:"내 사고" },
-          { icon: Users, color:"text-blue-400", value: mySubstitutes.length, label:"대체 근무" },
-          { icon: TrendingUp, color:"text-green-400", value: thisYearSubs, label:"올해 대체" },
+          { icon: Users, color:"text-blue-400", value: mySubstitutes.length, label:"대기 근무" },
+          { icon: TrendingUp, color:"text-green-400", value: thisYearSubs, label:"올해 대기" },
         ].map(({ icon: Icon, color, value, label }) => (
           <div key={label} className="flex-1 bg-white rounded-2xl p-4 shadow-sm text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
@@ -98,7 +98,7 @@ export default function MyPage() {
         </button>
         <button onClick={() => setTab("substitutes")}
           className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${tab === "substitutes" ? "bg-white text-black shadow-sm" : "text-gray-600"}`}>
-          대체 ({mySubstitutes.length})
+          대기 ({mySubstitutes.length})
         </button>
       </div>
 
@@ -121,20 +121,20 @@ export default function MyPage() {
               </div>
               {inc.substitutes?.length > 0 ? (
                 <div className="flex items-center gap-2 mt-2">
-                  <span className="text-xs text-gray-600">대체:</span>
+                  <span className="text-xs text-gray-600">대기:</span>
                   <RankBadge rank={inc.substitutes[0].user?.rank} size="sm" />
                   <span className="text-sm font-medium text-gray-900">{inc.substitutes[0].user?.name}</span>
                 </div>
-              ) : <span className="text-xs bg-orange-50 text-orange-400 font-bold px-3 py-1 rounded-full mt-2 inline-block">대체자 미정</span>}
+              ) : <span className="text-xs bg-orange-50 text-orange-400 font-bold px-3 py-1 rounded-full mt-2 inline-block">대기자 미정</span>}
             </div>
           ))
         ) : (
-          mySubstitutes.length === 0 ? <EmptyState text="대체 근무 기록이 없습니다" /> :
+          mySubstitutes.length === 0 ? <EmptyState text="대기 근무 기록이 없습니다" /> :
           mySubstitutes.map((sub) => (
             <div key={sub._id} className="bg-white rounded-2xl p-4 shadow-sm">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs text-gray-600">{sub.date ? formatDateKo(sub.date + "T00:00:00") : "-"}</p>
-                <span className="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">대체완료</span>
+                <span className="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">대기완료</span>
               </div>
               <div className="flex items-center gap-2">
                 <RankBadge rank={sub.incidentUser?.rank} size="sm" />
