@@ -23,7 +23,8 @@ export default function History() {
   const [filterDuty, setFilterDuty] = useState("");
   const [showFilter, setShowFilter] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [addSubIncident, setAddSubIncident] = useState(null); // incident 객체
+  const [addSubIncident, setAddSubIncident] = useState(null);
+  const [filterMissing, setFilterMissing] = useState(false);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -34,19 +35,20 @@ export default function History() {
   const allUsers = useQuery(api.users.listUsers) ?? [];
   const removeIncident = useMutation(api.incidents.remove);
 
-  const incidents = allIncidents
-    .filter((i) => !filterReason || i.reason === filterReason)
-    .filter((i) => !filterTeam || String(i.user?.team) === filterTeam)
-    .filter((i) => !filterDuty || i.duty === filterDuty)
-    .sort((a, b) => b.date.localeCompare(a.date));
-
-  // 당번 미정 판단: 당번인데 주간 or 야간 대체자가 없는 경우
+  // 당번 미정 판단
   const isPartialOrMissing = (inc) => {
     if (inc.shift !== "당번") return inc.substitutes?.length === 0;
     const hasDay = inc.substitutes?.some((s) => s.subShift === "주간");
     const hasNight = inc.substitutes?.some((s) => s.subShift === "야간");
     return !hasDay || !hasNight;
   };
+
+  const incidents = allIncidents
+    .filter((i) => !filterReason || i.reason === filterReason)
+    .filter((i) => !filterTeam || String(i.user?.team) === filterTeam)
+    .filter((i) => !filterDuty || i.duty === filterDuty)
+    .filter((i) => !filterMissing || isPartialOrMissing(i))
+    .sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -122,16 +124,25 @@ export default function History() {
 
       {/* 요약 */}
       <div className="flex gap-3 px-4 py-3">
-        {[
-          { label:"전체", value: incidents.length, color:"text-slate-500", bg:"bg-slate-100" },
-          { label:"대체완료", value: incidents.filter((i) => !isPartialOrMissing(i)).length, color:"text-sky-500", bg:"bg-sky-100" },
-          { label:"대체자 미정", value: incidents.filter((i) => isPartialOrMissing(i)).length, color:"text-rose-400", bg:"bg-rose-100" },
-        ].map(({ label, value, color, bg }) => (
-          <div key={label} className={`flex-1 ${bg} rounded-xl px-4 py-3 shadow-sm text-center`}>
-            <p className={`text-2xl font-bold ${color}`}>{value}</p>
-            <p className="text-xs text-gray-600">{label}</p>
-          </div>
-        ))}
+        <div className="flex-1 bg-slate-100 rounded-xl px-4 py-3 shadow-sm text-center cursor-pointer"
+          onClick={() => setFilterMissing(false)}>
+          <p className="text-2xl font-bold text-slate-500">{allIncidents.length}</p>
+          <p className="text-xs text-gray-600">전체</p>
+        </div>
+        <div className="flex-1 bg-sky-100 rounded-xl px-4 py-3 shadow-sm text-center cursor-pointer"
+          onClick={() => setFilterMissing(false)}>
+          <p className="text-2xl font-bold text-sky-500">{allIncidents.filter((i) => !isPartialOrMissing(i)).length}</p>
+          <p className="text-xs text-gray-600">대체완료</p>
+        </div>
+        <div onClick={() => setFilterMissing(!filterMissing)}
+          className={`flex-1 rounded-xl px-4 py-3 shadow-sm text-center cursor-pointer transition-all ${filterMissing ? "bg-rose-500 ring-2 ring-rose-400" : "bg-rose-100"}`}>
+          <p className={`text-2xl font-bold ${filterMissing ? "text-white" : "text-rose-400"}`}>
+            {allIncidents.filter((i) => isPartialOrMissing(i)).length}
+          </p>
+          <p className={`text-xs font-medium ${filterMissing ? "text-rose-100" : "text-gray-600"}`}>
+            {filterMissing ? "미정만 보기 ✓" : "대체자 미정"}
+          </p>
+        </div>
       </div>
 
       {/* 목록 */}
@@ -236,7 +247,9 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
             <div className="flex flex-col gap-1 flex-1">
               {singleSub ? (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 w-14">{inc.reason}</span>
+                  <span className="w-6 shrink-0" />
+                  <span className="w-7 shrink-0" />
+                  <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
                   <RankBadge rank={singleSub.user?.rank} size="sm" />
                   <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
                   <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
@@ -249,8 +262,10 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 w-14">{inc.reason}</span>
-                  <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
+                  <span className="w-6 shrink-0" />
+                  <span className="w-7 shrink-0" />
+                  <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
+                  <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">미정</span>
                 </div>
               )}
             </div>
@@ -282,7 +297,9 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
         ) : singleSub ? (
           // 주간/야간: 단일 대체자
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-600 font-medium w-14">대체</span>
+            <span className="w-6 shrink-0" />
+            <span className="w-7 shrink-0" />
+            <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
             <div className="flex items-center gap-1.5 flex-1">
               <RankBadge rank={singleSub.user?.rank} size="sm" />
               <span className="text-sm font-semibold text-gray-900">{singleSub.user?.name}</span>
@@ -298,7 +315,12 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
         ) : (
           // 미정
           <div className="flex items-center justify-between">
-            <span className="text-xs text-orange-400 bg-orange-50 font-bold px-3 py-1 rounded-full">대체자 미정</span>
+            <div className="flex items-center gap-2">
+              <span className="w-6 shrink-0" />
+              <span className="w-7 shrink-0" />
+              <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
+              <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-1 rounded-full">미정</span>
+            </div>
             <button onClick={onAddSub}
               className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full">
               <UserPlus size={12} />
@@ -330,7 +352,9 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
 function SubRow({ label, sub, missing, onRemove }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-gray-500 w-14">{label}</span>
+      <span className="w-6 shrink-0" />
+      <span className="text-xs text-gray-500 w-7 shrink-0">{label}</span>
+      <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
       {sub ? (
         <div className="flex items-center gap-1.5 flex-1">
           <RankBadge rank={sub.user?.rank} size="sm" />
@@ -344,7 +368,7 @@ function SubRow({ label, sub, missing, onRemove }) {
           )}
         </div>
       ) : (
-        <span className="text-xs text-orange-400 font-bold bg-orange-50 px-3 py-0.5 rounded-full">대체자 미정</span>
+        <span className="text-xs text-orange-400 font-bold bg-orange-50 px-2 py-0.5 rounded-full">미정</span>
       )}
     </div>
   );

@@ -99,9 +99,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-7 border-t border-gray-50 pt-2">
+        <div className="grid grid-cols-7 border-t border-gray-50 pt-1">
           {["일","월","화","수","목","금","토"].map((d, i) => (
-            <div key={d} className={`text-center text-[10px] font-bold py-1 ${i===0?"text-red-400":i===6?"text-blue-400 text-opacity-80":"text-gray-400 uppercase"}`}>{d}</div>
+            <div key={d} className={`text-center text-xs font-bold py-0.5 ${i===0?"text-red-500":i===6?"text-blue-500":"text-gray-700"}`}>{d}</div>
           ))}
         </div>
       </div>
@@ -297,7 +297,9 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
   );
 }
 
-// 대체근무자 표시 (당번: 주간/야간 분리, 그 외: 단일)
+// 대체근무자 표시
+// 정렬 기준: 상단 RankBadge(w-6) + gap-2 = 이름 시작점
+// 대체줄: [스페이서w-6] [라벨w-7 or 빈칸w-7] [→] [내용]
 function SubstituteDisplay({ inc, onAddSub }) {
   const isDuty = inc.shift === "당번";
   const isLateLeave = inc.reason === "지각" || inc.reason === "조퇴";
@@ -306,76 +308,72 @@ function SubstituteDisplay({ inc, onAddSub }) {
   const singleSub = !isDuty && inc.substitutes?.[0];
   const hasAll = isDuty ? (daySub && nightSub) : singleSub;
 
-  // 지각/조퇴 처리
+  // 단일 대체자 행 (라벨 없음 — 빈 w-7로 → 위치 맞춤)
+  const SingleRow = ({ sub, onAdd }) => (
+    <div className="flex items-center gap-2">
+      <span className="w-6 shrink-0" />
+      <span className="w-7 shrink-0" />
+      <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
+      {sub ? (
+        <>
+          <RankBadge rank={sub.user?.rank} size="sm" />
+          <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
+          <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
+        </>
+      ) : (
+        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">미정</span>
+      )}
+      {!sub && onAdd && (
+        <button onClick={onAdd}
+          className="ml-auto flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95">
+          <UserPlus size={12} />
+          등록
+        </button>
+      )}
+    </div>
+  );
+
+  // 지각/조퇴
   if (isLateLeave) {
-    const label = inc.reason;
-    return (
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1 flex-1">
-          {singleSub ? (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 w-14">{label}</span>
-              <RankBadge rank={singleSub.user?.rank} size="sm" />
-              <span className="text-sm font-medium text-gray-900">{singleSub.user?.name}</span>
-              <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 w-14">{label}</span>
-              <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
-            </div>
-          )}
-        </div>
-        {!singleSub && (
-          <button onClick={onAddSub}
-            className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
-            <UserPlus size={12} />
-            대체자 등록
-          </button>
-        )}
-      </div>
-    );
+    return <SingleRow sub={singleSub} onAdd={!singleSub ? onAddSub : null} />;
   }
 
+  // 당번: 주간/야간 각각
   if (isDuty) {
     return (
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex flex-col gap-1 flex-1">
-          {[{ label:"🌞 주간", sub: daySub }, { label:"🌙 야간", sub: nightSub }].map(({ label, sub }) => (
+          {[{ label:"주간", sub: daySub }, { label:"야간", sub: nightSub }].map(({ label, sub }) => (
             <div key={label} className="flex items-center gap-2">
-              <span className="text-xs text-gray-500 w-14">{label}</span>
-               {sub ? (
-                <div className="flex items-center gap-1.5">
+              <span className="w-6 shrink-0" />
+              <span className="text-xs text-gray-500 w-7 shrink-0">{label}</span>
+              <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
+              {sub ? (
+                <>
                   <RankBadge rank={sub.user?.rank} size="sm" />
                   <span className="text-sm font-medium text-gray-900">{sub.user?.name}</span>
                   <span className="text-xs text-gray-500">{sub.user?.team}팀</span>
-                </div>
+                </>
               ) : (
-                <span className="text-xs text-orange-400 bg-orange-50 px-3 py-0.5 rounded-full font-bold">대체자 미정</span>
+                <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">미정</span>
               )}
             </div>
           ))}
         </div>
         {!hasAll && (
           <button onClick={onAddSub}
-            className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
+            className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95">
             <UserPlus size={12} />
-            대체자 등록
+            등록
           </button>
         )}
       </div>
     );
   }
 
+  // 단일 대체자
   if (singleSub) {
-    return (
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-gray-500 w-14">대체</span>
-        <RankBadge rank={singleSub.user?.rank} size="sm" />
-        <span className="text-sm font-medium text-gray-900">{singleSub.user?.name}</span>
-        <span className="text-xs text-gray-500">{singleSub.user?.team}팀</span>
-      </div>
-    );
+    return <SingleRow sub={singleSub} />;
   }
 
   if (isDuty) {
