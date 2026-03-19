@@ -109,11 +109,11 @@ export default function Home() {
         {/* 네비게이션 영역 */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-1 rounded-full hover:bg-gray-100 active:scale-90 transition-transform">
+            <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-1 rounded-full active:bg-gray-200 active:scale-90 transition-all">
               <ChevronLeft size={20} className="text-gray-900" />
             </button>
             <h2 className="text-lg font-bold text-black tracking-tight">{year}년 {month + 1}월</h2>
-            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-1 rounded-full hover:bg-gray-100 active:scale-90 transition-transform">
+            <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-1 rounded-full active:bg-gray-200 active:scale-90 transition-all">
               <ChevronRight size={20} className="text-gray-900" />
             </button>
           </div>
@@ -217,7 +217,7 @@ export default function Home() {
 
        {/* FAB */}
        <button onClick={() => navigate("/incident-register")}
-         className="fixed right-5 bottom-[94px] w-14 h-14 bg-blue-600 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-30">
+         className="fixed right-5 bottom-[70px] w-14 h-14 bg-blue-600 rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-30">
          <Plus size={26} className="text-white" strokeWidth={2.5} />
        </button>
 
@@ -351,12 +351,12 @@ function SubstituteDisplay({ inc, onAddSub }) {
           <span className="text-xs text-gray-500 shrink-0">{sub.user?.team}팀</span>
         </div>
       ) : (
-        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">미정</span>
+        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">대체자 미정</span>
       )}
       {!sub && onAdd && (
         <button onClick={onAdd}
           className="ml-auto flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
-          <UserPlus size={12} />등록
+          <UserPlus size={12} />대체자 등록
         </button>
       )}
     </div>
@@ -376,7 +376,7 @@ function SubstituteDisplay({ inc, onAddSub }) {
         {!hasAll && (
           <button onClick={onAddSub}
             className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
-            <UserPlus size={12} />등록
+            <UserPlus size={12} />대체자 등록
           </button>
         )}
       </div>
@@ -393,11 +393,11 @@ function SubstituteDisplay({ inc, onAddSub }) {
         <span className="w-6 shrink-0" />
         <span className="w-7 shrink-0" />
         <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
-        <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-0.5 rounded-full">미정</span>
+        <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-0.5 rounded-full">대체자 미정</span>
       </div>
       <button onClick={onAddSub}
         className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full">
-        <UserPlus size={12} />등록
+        <UserPlus size={12} />대체자 등록
       </button>
     </div>
   );

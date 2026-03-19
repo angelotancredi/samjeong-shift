@@ -135,7 +135,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                   <span className="text-xs font-bold text-black truncate">{dayUser.name}</span>
                 </div>
               ) : (
-                <p className="text-xs font-bold text-orange-400">미정</p>
+                <p className="text-xs font-bold text-orange-400">대체자 미정</p>
               )}
             </button>
 
@@ -166,7 +166,7 @@ export default function AddSubstituteModal({ incident, users, onClose, onDone })
                   <span className="text-xs font-bold text-black truncate">{nightUser.name}</span>
                 </div>
               ) : (
-                <p className="text-xs font-bold text-orange-400">미정</p>
+                <p className="text-xs font-bold text-orange-400">대체자 미정</p>
               )}
             </button>
           </div>

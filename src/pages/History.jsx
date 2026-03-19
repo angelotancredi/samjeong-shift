@@ -98,11 +98,11 @@ export default function History() {
 
         {/* 날짜 네비게이션 */}
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
-          <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-1.5 rounded-full hover:bg-gray-100">
+          <button onClick={() => setCurrentDate(new Date(year, month - 1, 1))} className="p-1.5 rounded-full active:bg-gray-200 transition-colors">
             <ChevronLeft size={18} className="text-gray-800" />
           </button>
           <span className="text-base font-bold text-black">{year}년 {month + 1}월</span>
-          <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-1.5 rounded-full hover:bg-gray-100">
+          <button onClick={() => setCurrentDate(new Date(year, month + 1, 1))} className="p-1.5 rounded-full active:bg-gray-200 transition-colors">
             <ChevronRight size={18} className="text-gray-800" />
           </button>
         </div>
