@@ -1,8 +1,8 @@
 // 계급 배지 설정
 export const RANK_CONFIG = {
-  소방경: { short: "경", color: "#ef4444", bg: "#fef2f2" },
+  소방경: { short: "경", color: "#eab308", bg: "#fefce8" },
   소방위: { short: "위", color: "#f97316", bg: "#fff7ed" },
-  소방장: { short: "장", color: "#eab308", bg: "#fefce8" },
+  소방장: { short: "장", color: "#ef4444", bg: "#fef2f2" },
   소방교: { short: "교", color: "#22c55e", bg: "#f0fdf4" },
   소방사: { short: "사", color: "#3b82f6", bg: "#eff6ff" },
 };
