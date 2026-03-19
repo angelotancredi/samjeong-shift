@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Plus, RefreshCw, UserPlus } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
@@ -63,6 +63,22 @@ export default function Home() {
 
   const days = getDaysInMonth();
 
+  // 좌우 스와이프로 월 변경
+  const swipeStartX = useRef(null);
+  const handleCalSwipeStart = (e) => {
+    swipeStartX.current = e.touches?.[0]?.clientX ?? null;
+  };
+  const handleCalSwipeEnd = (e) => {
+    if (swipeStartX.current === null) return;
+    const endX = e.changedTouches?.[0]?.clientX ?? null;
+    if (endX === null) return;
+    const diff = swipeStartX.current - endX;
+    if (Math.abs(diff) > 50) {
+      setCurrentDate(new Date(year, diff > 0 ? month + 1 : month - 1, 1));
+    }
+    swipeStartX.current = null;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       {/* Header */}
@@ -110,7 +126,7 @@ export default function Home() {
       </div>
 
       {/* Calendar */}
-      <div className="bg-white px-3">
+      <div className="bg-white px-3" onTouchStart={handleCalSwipeStart} onTouchEnd={handleCalSwipeEnd}>
         <div className="grid grid-cols-7">
           {days.map((day, idx) => {
             const dateObj = day ? new Date(year, month, day) : null;
@@ -299,9 +315,7 @@ function DayModal({ date, incidents, allUsers, cycleBase, onClose, onAdd, setAdd
   );
 }
 
-// 대체근무자 표시
-// 정렬 기준: 상단 RankBadge(w-6) + gap-2 = 이름 시작점
-// 대체줄: [스페이서w-6] [라벨w-7 or 빈칸w-7] [→] [내용]
+// 대체근무자 표시 — 전체현황과 동일 구조
 function SubstituteDisplay({ inc, onAddSub }) {
   const isDuty = inc.shift === "당번";
   const isLateLeave = inc.reason === "지각" || inc.reason === "조퇴";
@@ -310,11 +324,13 @@ function SubstituteDisplay({ inc, onAddSub }) {
   const singleSub = !isDuty && inc.substitutes?.[0];
   const hasAll = isDuty ? (daySub && nightSub) : singleSub;
 
-  // 단일 대체자 행 (이전의 자연스러운 들여쓰기 복구)
-  const SingleRow = ({ sub, onAdd, label }) => (
+  // [w-6 스페이서][w-7 라벨or빈칸][→][내용]
+  const SubLine = ({ sub, label, onAdd }) => (
     <div className="flex items-center gap-2">
       <span className="w-6 shrink-0" />
-      <span className="text-xs text-gray-500 w-7 shrink-0 text-right">{label || ""}</span>
+      {label
+        ? <span className="text-xs text-gray-500 w-7 shrink-0">{label}</span>
+        : <span className="w-7 shrink-0" />}
       <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
       {sub ? (
         <div className="flex items-center gap-1.5 flex-1 min-w-0">
@@ -323,42 +339,54 @@ function SubstituteDisplay({ inc, onAddSub }) {
           <span className="text-xs text-gray-500 shrink-0">{sub.user?.team}팀</span>
         </div>
       ) : (
-        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">대체자 미정</span>
+        <span className="text-xs text-orange-400 bg-orange-50 px-2 py-0.5 rounded-full font-bold">미정</span>
       )}
       {!sub && onAdd && (
         <button onClick={onAdd}
           className="ml-auto flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
-          <UserPlus size={12} />
-          대체자 등록
+          <UserPlus size={12} />등록
         </button>
       )}
     </div>
   );
 
-  // 지각/조퇴
   if (isLateLeave) {
-    return <SingleRow sub={singleSub} onAdd={!singleSub ? onAddSub : null} />;
+    return <SubLine sub={singleSub} onAdd={!singleSub ? onAddSub : null} />;
   }
 
-  // 당번: 주간/야간 각각 (전체현황처럼 우측에 버튼 하나만 배치)
   if (isDuty) {
     return (
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-col gap-1.5 flex-1">
-          <SingleRow sub={daySub} label="주간" />
-          <SingleRow sub={nightSub} label="야간" />
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col gap-1 flex-1">
+          <SubLine sub={daySub} label="주간" />
+          <SubLine sub={nightSub} label="야간" />
         </div>
         {!hasAll && (
           <button onClick={onAddSub}
             className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full shrink-0 active:scale-95 transition-transform">
-            <UserPlus size={12} />
-            대체자 등록
+            <UserPlus size={12} />등록
           </button>
         )}
       </div>
     );
   }
 
-  // 단일 대체자 (지각/조퇴 포함 일반 상급)
-  return <SingleRow sub={singleSub} onAdd={!singleSub ? onAddSub : null} />;
+  if (singleSub) {
+    return <SubLine sub={singleSub} />;
+  }
+
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <span className="w-6 shrink-0" />
+        <span className="w-7 shrink-0" />
+        <span className="text-xs font-bold text-blue-400 shrink-0">→</span>
+        <span className="text-xs text-orange-400 bg-orange-50 font-bold px-2 py-0.5 rounded-full">미정</span>
+      </div>
+      <button onClick={onAddSub}
+        className="flex items-center gap-1 text-xs text-blue-600 font-medium px-2.5 py-1.5 bg-blue-50 rounded-full">
+        <UserPlus size={12} />등록
+      </button>
+    </div>
+  );
 }
