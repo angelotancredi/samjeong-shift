@@ -81,25 +81,51 @@ export const addSubstituteDuty = mutation({
 
 // 대기자 단건 삭제
 export const removeSubstitute = mutation({
-  args: { incidentId: v.id("incidents"), subShift: v.optional(v.string()) },
-  handler: async (ctx, { incidentId, subShift }) => {
+  args: { 
+    incidentId: v.id("incidents"), 
+    subShift: v.optional(v.string()),
+    requesterId: v.id("users") 
+  },
+  handler: async (ctx, { incidentId, subShift, requesterId }) => {
+    const incident = await ctx.db.get(incidentId);
+    if (!incident) throw new Error("사고 내역을 찾을 수 없습니다.");
+
+    const requester = await ctx.db.get(requesterId);
+    if (!requester) throw new Error("사용자를 찾을 수 없습니다.");
+
     const subs = await ctx.db
       .query("substitutes")
       .withIndex("by_incident", (q) => q.eq("incidentId", incidentId))
       .collect();
 
+    let target = null;
     if (subShift) {
-      // 당번: 특정 슬롯만 삭제
-      const target = subs.find((s) => s.subShift === subShift);
-      if (target) await ctx.db.delete(target._id);
+      target = subs.find((s) => s.subShift === subShift);
     } else {
-      // 단일: 전체 삭제
+      // 단일 대기자 (지각/조퇴 등)
+      target = subs[0];
+    }
+
+    if (!target) return; // 이미 없으면 무시
+
+    // 권한 체크: 관리자, 사고 등록자, 사고 당사자(본인), 또는 대기 당사자(본인)만 취소 가능
+    const isAdmin = requester.isAdmin;
+    const isSubmitter = incident.registeredBy === requesterId || (!incident.registeredBy && incident.userId === requesterId);
+    const isIncidentSubject = incident.userId === requesterId;
+    const isSubstituteSubject = target.substituteUserId === requesterId;
+
+    if (!isAdmin && !isSubmitter && !isIncidentSubject && !isSubstituteSubject) {
+      throw new Error("취소 권한이 없습니다.");
+    }
+
+    if (subShift) {
+      await ctx.db.delete(target._id);
+    } else {
       await Promise.all(subs.map((s) => ctx.db.delete(s._id)));
     }
 
     // 알림
-    const incident = await ctx.db.get(incidentId);
-    const incidentUser = incident ? await ctx.db.get(incident.userId) : null;
+    const incidentUser = await ctx.db.get(incident.userId);
     const shiftText = subShift ? `(${subShift})` : "";
     const message = `[${incident?.date}] ${incidentUser?.name} 대기근무자${shiftText} 취소`;
     await sendNotification(ctx, incident, message);

@@ -415,7 +415,7 @@ function Step1({ form, update, profile }) {
 
       <div className="bg-white rounded-2xl p-4 shadow-sm">
         <h3 className="font-bold text-black mb-3">사고 사유</h3>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           {ABSENCE_REASONS.map((r) => (
             <button key={r} onClick={() => update("reason", r)}
               className={`py-3 rounded-xl text-sm font-semibold transition-all ${form.reason === r ? "bg-red-500 text-white" : "bg-gray-50 text-gray-800 border border-gray-100"}`}>

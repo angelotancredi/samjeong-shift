@@ -10,7 +10,7 @@ export const RANK_CONFIG = {
 export const RANKS = ["소방경", "소방위", "소방장", "소방교", "소방사"];
 export const TEAMS = [1, 2, 3];
 export const SHIFT_TYPES = ["당번", "주간", "야간"];
-export const ABSENCE_REASONS = ["연가", "병가", "특휴", "공가", "출장", "장기재직", "안식휴가", "지각", "조퇴"];
+export const ABSENCE_REASONS = ["연가", "병가", "특휴", "공가", "출장", "출산휴가", "장기재직", "안식휴가", "지각", "조퇴"];
 
 export const DUTY_ROLES = [
   "팀장",

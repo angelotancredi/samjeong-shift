@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Users, Settings, BarChart2, Trash2, Shield, RefreshCw, GripVertical } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -264,7 +264,7 @@ function DraggableTeamList({ team, teamUsers, teamStyle, profile, onToggleAdmin,
   const [isDragMode, setIsDragMode] = useState(false);
 
   // teamUsers가 바뀌면 items 동기화
-  useState(() => { setItems(teamUsers); }, [teamUsers]);
+  useEffect(() => { setItems(teamUsers); }, [teamUsers]);
 
   const handleTouchStart = (id) => {
     longPressTimer.current = setTimeout(() => {

@@ -14,7 +14,7 @@ const REASON_COLORS = {
   연가:"bg-blue-100 text-blue-700", 병가:"bg-red-100 text-red-700",
   특휴:"bg-purple-100 text-purple-700", 공가:"bg-amber-100 text-amber-700",
   지각:"bg-orange-100 text-orange-700", 조퇴:"bg-pink-100 text-pink-700",
-  출장:"bg-cyan-100 text-cyan-700", 장기재직:"bg-indigo-100 text-indigo-700", 안식휴가:"bg-teal-100 text-teal-700",
+  출장:"bg-cyan-100 text-cyan-700", 출산휴가:"bg-rose-100 text-rose-700", 장기재직:"bg-indigo-100 text-indigo-700", 안식휴가:"bg-teal-100 text-teal-700",
 };
 
 export default function History() {
@@ -202,7 +202,7 @@ export default function History() {
               <p className="text-gray-700 text-sm mb-5">이 내역을 삭제하면 복구할 수 없습니다.</p>
               <div className="flex gap-3">
                 <button onClick={() => setDeleteId(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
-                <button onClick={async () => { await removeIncident({ id: deleteId }); setDeleteId(null); }}
+                <button onClick={async () => { await removeIncident({ id: deleteId, requesterId: profile?._id }); setDeleteId(null); }}
                   className="flex-1 py-3.5 bg-red-500 rounded-xl font-semibold text-white">삭제</button>
               </div>
             </div>
@@ -257,7 +257,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
           <p className="text-xs text-gray-600 mt-1">{formatDateKo(inc.date + "T00:00:00")}</p>
           {inc.note && <p className="text-xs text-gray-700 mt-1">{inc.note}</p>}
         </div>
-        {(profile?.isAdmin || profile?._id === inc.registeredBy) && (
+        {(profile?.isAdmin || profile?._id === inc.registeredBy || profile?._id === inc.userId) && (
           <button onClick={onDelete} className="p-1.5 text-gray-400 hover:text-red-400">
             <Trash2 size={15} />
           </button>
@@ -278,7 +278,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
                   <RankBadge rank={singleSub.user?.rank} size="sm" />
                   <span className="text-sm font-semibold text-gray-900 truncate">{singleSub.user?.name}</span>
                   <span className="text-xs text-gray-500 shrink-0">{singleSub.user?.team}팀</span>
-                  {(profile?.isAdmin || profile?._id === inc.registeredBy) && (
+                  {(profile?.isAdmin || profile?._id === inc.registeredBy || profile?._id === inc.userId || profile?._id === singleSub.substituteUserId) && (
                     <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
                       className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
                       <Trash2 size={13} />
@@ -307,9 +307,9 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
           <div className="flex items-center justify-between gap-4">
             <div className="flex flex-col gap-1 flex-1">
                <SubRow label="주간" sub={daySub} missing={!daySub}
-                onRemove={daySub && (profile?.isAdmin || profile?._id === inc.registeredBy) ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "주간" }) : undefined} />
+                onRemove={daySub && (profile?.isAdmin || profile?._id === inc.registeredBy || profile?._id === inc.userId || profile?._id === daySub.substituteUserId) ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "주간" }) : undefined} />
               <SubRow label="야간" sub={nightSub} missing={!nightSub}
-                onRemove={nightSub && (profile?.isAdmin || profile?._id === inc.registeredBy) ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "야간" }) : undefined} />
+                onRemove={nightSub && (profile?.isAdmin || profile?._id === inc.registeredBy || profile?._id === inc.userId || profile?._id === nightSub.substituteUserId) ? () => setDeleteSubInfo({ incidentId: inc._id, subShift: "야간" }) : undefined} />
             </div>
             {isPartialOrMissing && (
               <button onClick={onAddSub}
@@ -329,7 +329,7 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
               <RankBadge rank={singleSub.user?.rank} size="sm" />
               <span className="text-sm font-semibold text-gray-900 truncate">{singleSub.user?.name}</span>
               <span className="text-xs text-gray-500 shrink-0">{singleSub.user?.team}팀</span>
-               {(profile?.isAdmin || profile?._id === inc.registeredBy) && (
+               {(profile?.isAdmin || profile?._id === inc.registeredBy || profile?._id === inc.userId || profile?._id === singleSub.substituteUserId) && (
                 <button onClick={() => setDeleteSubInfo({ incidentId: inc._id })}
                   className="ml-auto text-red-400 hover:text-red-600 transition-colors p-0.5">
                   <Trash2 size={13} />
@@ -369,11 +369,11 @@ function IncidentCard({ inc, profile, onDelete, onAddSub, isPartialOrMissing }) 
             <div className="p-6 pt-2">
               <h3 className="font-bold text-lg text-black mb-2">대기자를 삭제하시겠습니까?</h3>
               <p className="text-gray-700 text-sm mb-5">이 대기자 정보를 삭제하면 복구할 수 없습니다.</p>
-              <div className="flex gap-3">
-                <button onClick={() => setDeleteSubInfo(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
-                <button onClick={async () => { await removeSubstitute(deleteSubInfo); setDeleteSubInfo(null); }}
-                  className="flex-1 py-3.5 bg-red-500 rounded-xl font-semibold text-white">삭제</button>
-              </div>
+               <div className="flex gap-3">
+                 <button onClick={() => setDeleteSubInfo(null)} className="flex-1 py-3.5 border border-gray-200 rounded-xl font-semibold text-gray-800">취소</button>
+                 <button onClick={async () => { await removeSubstitute({ ...deleteSubInfo, requesterId: profile?._id }); setDeleteSubInfo(null); }}
+                   className="flex-1 py-3.5 bg-red-500 rounded-xl font-semibold text-white">삭제</button>
+               </div>
             </div>
           </div>
         </div>

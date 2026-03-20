@@ -197,8 +197,23 @@ export const create = mutation({
 
 // 사고 삭제
 export const remove = mutation({
-  args: { id: v.id("incidents") },
-  handler: async (ctx, { id }) => {
+  args: { id: v.id("incidents"), requesterId: v.id("users") },
+  handler: async (ctx, { id, requesterId }) => {
+    const inc = await ctx.db.get(id);
+    if (!inc) throw new Error("사고 내역을 찾을 수 없습니다.");
+
+    const requester = await ctx.db.get(requesterId);
+    if (!requester) throw new Error("사용자를 찾을 수 없습니다.");
+
+    // 권한 체크: 관리자, 최초 등록자, 또는 사고 대상자(본인)만 삭제 가능
+    const isAdmin = requester.isAdmin;
+    const isSubmitter = inc.registeredBy === requesterId || (!inc.registeredBy && inc.userId === requesterId);
+    const isSubject = inc.userId === requesterId;
+
+    if (!isAdmin && !isSubmitter && !isSubject) {
+      throw new Error("삭제 권한이 없습니다.");
+    }
+
     const subs = await ctx.db
       .query("substitutes")
       .withIndex("by_incident", (q) => q.eq("incidentId", id))
