@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react";
 const navItems = [
   { path: "/", icon: Home, label: "홈" },
   { path: "/history", icon: List, label: "현황" },
-  { path: "/mypage", icon: User, label: "내 기록" },
+  { path: "/mypage", icon: User, label: "내 근무" },
 ];
 
 export default function BottomNav() {
@@ -15,9 +15,7 @@ export default function BottomNav() {
   const { profile, logout } = useAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const items = profile?.isAdmin
-    ? [...navItems, { path: "/admin", icon: Settings, label: "관리자" }]
-    : navItems;
+  const items = [...navItems, { path: "/admin", icon: Settings, label: "관리" }];
 
   const handleLogout = () => {
     logout();

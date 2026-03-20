@@ -14,7 +14,7 @@ const REASON_COLORS = {
   연가:"bg-blue-100 text-blue-700", 병가:"bg-red-100 text-red-700",
   특휴:"bg-purple-100 text-purple-700", 공가:"bg-amber-100 text-amber-700",
   지각:"bg-orange-100 text-orange-700", 조퇴:"bg-pink-100 text-pink-700",
-  출장:"bg-cyan-100 text-cyan-700", 출산휴가:"bg-rose-100 text-rose-700", 장기재직:"bg-indigo-100 text-indigo-700", 안식휴가:"bg-teal-100 text-teal-700",
+  출장:"bg-cyan-100 text-cyan-700", 교육:"bg-emerald-100 text-emerald-700", 출산휴가:"bg-rose-100 text-rose-700", 장기재직:"bg-indigo-100 text-indigo-700", 안식휴가:"bg-teal-100 text-teal-700",
 };
 
 export default function History() {

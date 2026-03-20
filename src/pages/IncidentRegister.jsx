@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ChevronLeft, Info, Calendar as CalendarIcon, Clock, AlertCircle, Check, MapPin, RefreshCw, Search } from "lucide-react";
+import { ChevronLeft, Info, Calendar as CalendarIcon, Clock, AlertCircle, Check, MapPin, RefreshCw, Search, X } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { useAuth } from "../context/AuthContext";
@@ -326,7 +326,7 @@ export default function IncidentRegister() {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 py-4 border border-gray-200 rounded-xl font-semibold text-gray-800 text-sm"
+              className="flex-1 py-4 border-2 border-orange-200 text-orange-600 bg-orange-50/20 rounded-xl font-bold text-sm"
             >
               대기자 없이 등록
             </button>
@@ -569,9 +569,20 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
             🌞 주간 대기
           </p>
           {form.sub_day ? (
-            <div className="flex items-center gap-2">
-              <RankBadge rank={form.sub_day.rank} size="sm" />
-              <span className="text-sm font-bold text-black truncate">{form.sub_day.name}</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 overflow-hidden">
+                <RankBadge rank={form.sub_day.rank} size="sm" />
+                <span className="text-sm font-bold text-black truncate">{form.sub_day.name}</span>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  update("sub_day_id", null); update("sub_day", null);
+                }}
+                className="p-1 hover:bg-blue-100 rounded-full text-blue-400"
+              >
+                <X size={14} />
+              </button>
             </div>
           ) : (
             <p className="text-sm font-bold text-orange-400">대기자 미정</p>
@@ -587,9 +598,20 @@ function Step2Duty({ form, update, searchQuery, setSearchQuery, filteredUsers })
             🌙 야간 대기
           </p>
           {form.sub_night ? (
-            <div className="flex items-center gap-2">
-              <RankBadge rank={form.sub_night.rank} size="sm" />
-              <span className="text-sm font-bold text-black truncate">{form.sub_night.name}</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 overflow-hidden">
+                <RankBadge rank={form.sub_night.rank} size="sm" />
+                <span className="text-sm font-bold text-black truncate">{form.sub_night.name}</span>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  update("sub_night_id", null); update("sub_night", null);
+                }}
+                className="p-1 hover:bg-violet-100 rounded-full text-violet-400"
+              >
+                <X size={14} />
+              </button>
             </div>
           ) : (
             <p className="text-sm font-bold text-orange-400">대기자 미정</p>
@@ -660,6 +682,34 @@ function Step2Single({ form, update, searchQuery, setSearchQuery, filteredUsers 
             <p className="text-xs text-gray-700">{formatDateKo(form.date)} · {form.reason} · {form.shift}</p>
           </div>
         </div>
+      </div>
+
+      <div className="bg-white rounded-2xl p-4 shadow-sm">
+        <p className="text-xs text-gray-400 font-bold mb-2">선택된 대기근무자</p>
+        {form.substitute_user ? (
+          <div className="flex items-center justify-between bg-green-50 border border-green-100 rounded-xl p-3">
+            <div className="flex items-center gap-3">
+              <RankBadge rank={form.substitute_user.rank} size="md" />
+              <div>
+                <p className="font-bold text-black">{form.substitute_user.name}</p>
+                <p className="text-xs text-gray-600">{form.substitute_user.team}팀 · {form.substitute_user.rank}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                update("substitute_user_id", null); update("substitute_user", null);
+              }}
+              className="p-2 hover:bg-green-100 rounded-full text-green-600 transition-colors"
+            >
+              <X size={18} />
+            </button>
+          </div>
+        ) : (
+          <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-4 text-center">
+            <p className="text-sm font-bold text-orange-400">대기자 미정</p>
+            <p className="text-[10px] text-gray-500 mt-0.5">아래 리스트에서 직원을 선택해 주세요</p>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl p-4 shadow-sm">

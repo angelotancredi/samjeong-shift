@@ -13,6 +13,7 @@ const REASON_COLORS = {
   연가:"bg-blue-100 text-blue-700", 병가:"bg-red-100 text-red-700",
   특휴:"bg-purple-100 text-purple-700", 공가:"bg-amber-100 text-amber-700",
   지각:"bg-orange-100 text-orange-700", 조퇴:"bg-pink-100 text-pink-700",
+  교육:"bg-emerald-100 text-emerald-700",
 };
 
 export default function MyPage() {
@@ -61,7 +62,7 @@ export default function MyPage() {
 
         {/* 2단: 페이지 타이틀 */}
         <div className="flex items-center justify-between mb-1">
-          <h1 className="text-lg font-bold text-black tracking-tight">내 기록</h1>
+          <h1 className="text-lg font-bold text-black tracking-tight">내 근무</h1>
         </div>
         <div className="flex items-center gap-4 bg-gray-50 rounded-2xl p-4">
           <RankBadge rank={profile?.rank} size="lg" />
