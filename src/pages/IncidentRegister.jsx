@@ -429,7 +429,7 @@ function Step1({ form, update, profile }) {
       {(form.reason === "지각" || form.reason === "조퇴") && (
         <div className="bg-white rounded-2xl p-4 shadow-sm">
           <h3 className="font-bold text-black mb-3">시간 범위</h3>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
             {/* 시작 시간 */}
             <div className="flex items-center gap-2 flex-1">
               <select
@@ -438,9 +438,9 @@ function Step1({ form, update, profile }) {
                   const mins = form.startTime.split(':')[1] || "00";
                   update("startTime", `${e.target.value}:${mins}`);
                 }}
-                className="flex-1 px-3 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-2 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
               >
-                <option value="">시 선택</option>
+                <option value="">시</option>
                 {Array.from({ length: 24 }, (_, i) => (
                   <option key={i} value={String(i).padStart(2, "0")}>
                     {String(i).padStart(2, "0")}
@@ -454,9 +454,9 @@ function Step1({ form, update, profile }) {
                   const hours = form.startTime.split(':')[0] || "00";
                   update("startTime", `${hours}:${e.target.value}`);
                 }}
-                className="flex-1 px-3 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-2 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
               >
-                <option value="">분 선택</option>
+                <option value="">분</option>
                 <option value="00">00</option>
                 <option value="10">10</option>
                 <option value="20">20</option>
@@ -465,7 +465,7 @@ function Step1({ form, update, profile }) {
                 <option value="50">50</option>
               </select>
             </div>
-            <span className="text-gray-400 font-semibold">~</span>
+            <span className="text-gray-400 font-bold mx-0.5">~</span>
             {/* 종료 시간 */}
             <div className="flex items-center gap-2 flex-1">
               <select
@@ -474,9 +474,9 @@ function Step1({ form, update, profile }) {
                   const mins = form.endTime.split(':')[1] || "00";
                   update("endTime", `${e.target.value}:${mins}`);
                 }}
-                className="flex-1 px-3 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-2 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
               >
-                <option value="">시 선택</option>
+                <option value="">시</option>
                 {Array.from({ length: 24 }, (_, i) => (
                   <option key={i} value={String(i).padStart(2, "0")}>
                     {String(i).padStart(2, "0")}
@@ -490,9 +490,9 @@ function Step1({ form, update, profile }) {
                   const hours = form.endTime.split(':')[0] || "00";
                   update("endTime", `${hours}:${e.target.value}`);
                 }}
-                className="flex-1 px-3 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-2 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
               >
-                <option value="">분 선택</option>
+                <option value="">분</option>
                 <option value="00">00</option>
                 <option value="10">10</option>
                 <option value="20">20</option>
