@@ -70,15 +70,6 @@ export default function Admin() {
     setDeleteUserId(null);
   };
 
-  if (!profile?.isAdmin) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-3 pb-24">
-        <p className="text-4xl">🔒</p>
-        <p className="text-gray-700 font-medium">관리자 권한이 필요합니다</p>
-        <BottomNav />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -128,7 +119,7 @@ export default function Admin() {
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <p className="text-xs text-gray-600 font-medium">총 {allUsers.length}명</p>
-              <p className="text-xs text-gray-400">☰ 길게 눌러 순서 변경</p>
+              {profile?.isAdmin && <p className="text-xs text-gray-400">☰ 길게 눌러 순서 변경</p>}
             </div>
             {[1, 2, 3].map((team) => {
               const teamUsers = allUsers
@@ -168,29 +159,41 @@ export default function Admin() {
               <p className="text-xs text-blue-500 mt-1">사이클: 당번 → 비번 → 비번 (3일)</p>
             </div>
             <div className="bg-white rounded-2xl p-4 shadow-sm">
-              <h3 className="font-bold text-black mb-4">기준일 설정</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-black">기준일 설정</h3>
+                {!profile?.isAdmin && (
+                  <span className="text-[10px] bg-red-50 text-red-500 px-2 py-0.5 rounded-full font-bold">관리자 전용</span>
+                )}
+              </div>
+              {!profile?.isAdmin && (
+                <p className="text-xs text-red-400 font-medium mb-4">⚠️ 설정 변경은 관리자만 가능합니다.</p>
+              )}
               <div className="flex flex-col gap-3">
                 <div>
                   <label className="text-sm font-medium text-gray-800 mb-1.5 block">기준 날짜</label>
-                  <input type="date" value={cycleForm.baseDate}
-                    onChange={(e) => setCycleForm((f) => ({ ...f, baseDate: e.target.value }))}
-                    className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <input type="date" value={cycleForm.baseDate}
+                      disabled={!profile?.isAdmin}
+                      onChange={(e) => setCycleForm((f) => ({ ...f, baseDate: e.target.value }))}
+                      className="w-full px-4 py-3 bg-gray-50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" />
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-800 mb-1.5 block">해당 날짜의 당번 팀</label>
                   <div className="grid grid-cols-3 gap-2">
                     {["1", "2", "3"].map((t) => (
                       <button key={t} onClick={() => setCycleForm((f) => ({ ...f, baseTeam: t }))}
-                        className={`py-3 rounded-xl text-sm font-bold transition-all ${
+                        disabled={!profile?.isAdmin}
+                        className={`py-3 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${
                           cycleForm.baseTeam === t ? "bg-blue-600 text-white" : "bg-gray-50 text-gray-800 border border-gray-100"
                         }`}>{t}팀</button>
                     ))}
                   </div>
                 </div>
-                <button onClick={saveCycle} disabled={savingCycle}
-                  className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold mt-1 disabled:opacity-60">
-                  {savingCycle ? "저장 중..." : "저장"}
-                </button>
+                {profile?.isAdmin && (
+                  <button onClick={saveCycle} disabled={savingCycle}
+                    className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-semibold mt-1 disabled:opacity-60">
+                    {savingCycle ? "저장 중..." : "저장"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -326,20 +329,24 @@ function DraggableTeamList({ team, teamUsers, teamStyle, profile, onToggleAdmin,
           } ${dragOverId === u._id && draggingId !== u._id ? "border-t-2 border-blue-400" : ""}`}
         >
           {/* 드래그 핸들 */}
-          <div className="text-gray-300 cursor-grab active:cursor-grabbing touch-none">
-            <GripVertical size={16} />
-          </div>
+          {profile?.isAdmin && (
+            <div className="text-gray-300 cursor-grab active:cursor-grabbing touch-none">
+              <GripVertical size={16} />
+            </div>
+          )}
           <RankBadge rank={u.rank} size="sm" />
           <div className="flex-1 flex items-center gap-2">
             <span className="font-bold text-gray-900 text-sm">{u.name}</span>
             <span className="text-xs text-gray-500 font-medium">{u.rank}</span>
             {u.isAdmin && <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-bold ml-1">관리자</span>}
           </div>
-          <button onClick={() => onToggleAdmin(u)}
-            className={`p-1.5 rounded-lg transition-colors ${u.isAdmin ? "text-blue-500 bg-blue-50" : "text-gray-500 hover:bg-gray-50"}`}>
-            <Shield size={15} />
-          </button>
-          {u._id !== profile._id && (
+          {profile?.isAdmin && (
+            <button onClick={() => onToggleAdmin(u)}
+              className={`p-1.5 rounded-lg transition-colors ${u.isAdmin ? "text-blue-500 bg-blue-50" : "text-gray-500 hover:bg-gray-50"}`}>
+              <Shield size={15} />
+            </button>
+          )}
+          {profile?.isAdmin && u._id !== profile._id && (
             <button onClick={() => onDelete(u._id)} className="p-1.5 text-gray-500 hover:text-red-400 transition-colors">
               <Trash2 size={15} />
             </button>
